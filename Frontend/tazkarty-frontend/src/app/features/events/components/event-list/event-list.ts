@@ -7,6 +7,8 @@ import { EventsService } from '../../../../core/services/events.service';
 import { Event, EventFilter, EventsResponse } from '../../../../models/event.model';
 import { ViewportScroller } from '@angular/common';
 import { LanguageService } from '../../../../core/services/language.service';
+import { environment } from '../../../../../environments/environment';
+
 
 @Component({
   selector: 'app-event-list',
@@ -324,6 +326,6 @@ export class EventList implements OnInit {
   private formatPosterUrl(url: string | undefined): string | null {
     if (!url) return null;
     if (url.startsWith('http')) return url;
-    return `http://localhost:5000/${url}`;
+    return `${environment.socketUrl}/${url}`;
   }
 }

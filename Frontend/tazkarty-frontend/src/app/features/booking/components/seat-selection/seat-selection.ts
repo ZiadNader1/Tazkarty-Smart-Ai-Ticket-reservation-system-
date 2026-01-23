@@ -10,6 +10,7 @@ import { InteractionEvent } from '../../../../shared/components/seat-renderer/se
 import { QRCodeComponent } from 'angularx-qrcode';
 import { BookingStepperComponent } from '../../../../shared/components/booking-stepper/booking-stepper.component';
 import { LanguageService } from '../../../../core/services/language.service';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-seat-selection',
@@ -436,7 +437,7 @@ export class SeatSelection implements OnInit, OnDestroy {
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
       return imagePath;
     }
-    return `http://localhost:5000/${imagePath}`;
+    return `${environment.socketUrl}/${imagePath}`;
   }
 
   getDisplayLayoutImage(): string {

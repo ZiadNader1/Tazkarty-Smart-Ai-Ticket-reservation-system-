@@ -6,6 +6,7 @@ import { EventsService } from '../../../../core/services/events.service';
 import { Show, Hall } from '../../../../models/show.model';
 import { Event } from '../../../../models/event.model';
 import { Venue } from '../../../../models/venue.model';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-admin-show-management',
@@ -408,5 +409,11 @@ export class AdminShowManagement implements OnInit {
       return (show.hall_id as any).capacity || 0;
     }
     return 0;
+  }
+
+  getImageUrl(path: string): string {
+    if (!path) return '';
+    if (path.startsWith('http')) return path;
+    return `${environment.socketUrl}/${path}`;
   }
 }

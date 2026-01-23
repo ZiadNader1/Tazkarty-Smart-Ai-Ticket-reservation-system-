@@ -12,6 +12,7 @@ import { Booking } from '../../../../models/booking.model';
 import { Show } from '../../../../models/show.model';
 import { Event } from '../../../../models/event.model';
 import { LanguageService } from '../../../../core/services/language.service';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-my-bookings',
@@ -141,7 +142,7 @@ export class MyBookings implements OnInit {
 
   getEventPoster(booking: Booking): string {
     if ((booking as any).isTrain) {
-      return 'http://localhost:5000/uploads/R.png'; // Using R.png from uploads as requested
+      return `${environment.socketUrl}/uploads/R.png`; // Using R.png from uploads
     }
 
     let url = '';
@@ -157,7 +158,7 @@ export class MyBookings implements OnInit {
 
     // Fix for relative paths (local uploads)
     if (url && !url.startsWith('http')) {
-      return `http://localhost:5000/${url.replace(/\\/g, '/')}`;
+      return `${environment.socketUrl}/${url.replace(/\\/g, '/')}`;
     }
 
     return url;

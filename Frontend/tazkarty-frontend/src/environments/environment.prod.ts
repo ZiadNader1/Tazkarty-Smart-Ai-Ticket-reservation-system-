@@ -1,8 +1,9 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://your-production-api.com/api',
-  socketUrl: 'https://your-production-api.com',
-  stripePublishableKey: 'pk_live_YOUR_LIVE_STRIPE_KEY_HERE',
+  apiUrl: 'https://tazkarty-backend.onrender.com/api',
+  socketUrl: 'https://tazkarty-backend.onrender.com',
+  stripePublishableKey: 'pk_test_TYooMQauvdEDq54NiTphI7jx',
+
   features: {
     enableAI: true,
     enableNotifications: true,

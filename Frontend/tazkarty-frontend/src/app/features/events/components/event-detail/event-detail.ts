@@ -7,6 +7,7 @@ import { Event } from '../../../../models/event.model';
 import { Show } from '../../../../models/show.model';
 import { User } from '../../../../models/user.model';
 import { LanguageService } from '../../../../core/services/language.service';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-event-detail',
@@ -277,6 +278,6 @@ export class EventDetail implements OnInit {
   private formatPosterUrl(url: string): string {
     if (!url) return 'assets/placeholder-event.svg';
     if (url.startsWith('http')) return url;
-    return `http://localhost:5000/${url.startsWith('/') ? url.slice(1) : url}`; // Normalize path
+    return `${environment.socketUrl}/${url.startsWith('/') ? url.slice(1) : url}`; // Normalize path
   }
 }
