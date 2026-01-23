@@ -56,22 +56,24 @@ app.use(cors({
     // Also allow any localhost in development
     if (process.env.NODE_ENV === 'development' && origin.startsWith('http://localhost:')) {
       return callback(null, true);
-      // Allow any Vercel deployment
-      if (origin.endsWith('.vercel.app')) {
-        return callback(null, true);
-      }
+    }
 
-      if (allowedOrigins.indexOf(origin) === -1) {
-        // For debugging, you might want to log the blocked origin
-        console.log('Blocked by CORS:', origin);
-        // Fail safely for unknown origins to avoid crashing
-        // return callback(new Error('The CORS policy for this site does not allow access from the specified Origin.'), false); 
-        return callback(null, false);
-      }
+    // Allow any Vercel deployment
+    if (origin.endsWith('.vercel.app')) {
       return callback(null, true);
-    },
-    credentials: true
-  }));
+    }
+
+    if (allowedOrigins.indexOf(origin) === -1) {
+      // For debugging, you might want to log the blocked origin
+      console.log('Blocked by CORS:', origin);
+      // Fail safely for unknown origins to avoid crashing
+      // return callback(new Error('The CORS policy for this site does not allow access from the specified Origin.'), false); 
+      return callback(null, false);
+    }
+    return callback(null, true);
+  },
+  credentials: true
+}));
 
 // ⚠️ IMPORTANT: Webhook route MUST be before express.json()
 app.use("/api/payments/webhook", express.raw({ type: 'application/json' }));
