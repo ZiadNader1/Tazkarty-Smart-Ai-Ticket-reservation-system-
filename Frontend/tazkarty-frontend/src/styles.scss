@@ -1,0 +1,210 @@
+/* 
+Global Styles & Custom Components 
+Dark Mode Design System (Green/Dark)
+Always dark mode - no theme switching
+*/
+
+// Tailwind CSS
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+// -----------------------------------------------------------------------------
+// Base Layer - Always Dark Mode
+// -----------------------------------------------------------------------------
+@layer base {
+  * {
+    @apply border-border-dark;
+  }
+
+  body {
+    @apply bg-dark-bg text-dark-text antialiased font-sans;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
+
+  /* Support for Arabic Font */
+  [dir="rtl"] body,
+  .font-arabic {
+    font-family: 'Cairo', sans-serif !important;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading font-bold text-white;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Component Layer
+// -----------------------------------------------------------------------------
+@layer components {
+
+  // --- Buttons ---
+  .btn {
+    @apply px-6 py-3 rounded-lg font-semibold transition-all duration-200 cursor-pointer flex items-center justify-center;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none;
+  }
+
+  /* Primary Action Button (Green Theme) */
+  .btn-primary {
+    @apply bg-primary-600 text-white shadow-lg shadow-green-500/30;
+    @apply hover:bg-green-700 hover:shadow-green-500/50 hover:-translate-y-0.5;
+    @apply active:translate-y-0 active:shadow-md;
+  }
+
+  .btn-secondary {
+    @apply bg-dark-card text-gray-300 border border-gray-700 shadow-sm;
+    @apply hover:bg-gray-800 hover:text-primary-400 hover:border-primary-700;
+  }
+
+  .btn-outline {
+    @apply bg-transparent text-primary-400 border border-primary-400;
+    @apply hover:bg-primary-900/20;
+  }
+
+  .btn-text {
+    @apply bg-transparent text-gray-400 hover:text-primary-400 shadow-none px-4;
+  }
+
+  // --- Cards (Ticket Style) ---
+  .card {
+    @apply bg-dark-card rounded-ticket shadow-card p-6 border border-gray-800;
+    @apply hover:shadow-card-hover hover:border-primary-900 transition-all duration-300;
+
+    /* Optional: Add a left accent border for conversion cards */
+    &.card-highlight {
+      @apply border-l-4 border-l-primary-500 relative overflow-hidden;
+    }
+  }
+
+  // --- Inputs ---
+  .input {
+    @apply w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-gray-200;
+    @apply placeholder-gray-600;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500/40 focus:border-primary-500;
+    @apply transition-all duration-200;
+  }
+
+  // --- Seat Map Styles ---
+  .seat {
+    @apply w-10 h-10 rounded-t-lg flex items-center justify-center cursor-pointer select-none;
+    @apply text-xs font-bold transition-transform duration-150 ease-out;
+    @apply border-2 border-transparent shadow-sm;
+  }
+
+  .seat-available {
+    @apply bg-gray-800 border-green-600 text-green-400;
+    @apply hover:bg-green-900/20 hover:scale-110 hover:shadow-md;
+  }
+
+  .seat-selected {
+    @apply bg-primary-500 text-white scale-110 shadow-lg shadow-green-500/40 border-primary-500;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .seat-locked {
+    @apply bg-gray-800 text-gray-600 border-gray-700 cursor-not-allowed;
+  }
+
+  .seat-booked {
+    @apply bg-gray-900 text-gray-700 border-gray-800 cursor-not-allowed opacity-50;
+  }
+
+  .seat-vip {
+    @apply bg-purple-900/10 text-purple-400 border-purple-500;
+    @apply hover:bg-purple-100;
+  }
+
+  // --- Typography Utilities ---
+  .heading-lg {
+    @apply text-3xl md:text-4xl font-extrabold text-white tracking-tight;
+  }
+
+  .heading-md {
+    @apply text-xl md:text-2xl font-bold text-white;
+  }
+
+  .subheading {
+    @apply text-lg text-gray-400 font-medium;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Utility Layer
+// -----------------------------------------------------------------------------
+@layer utilities {
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-green-500;
+  }
+
+  /* Ticket Cutout Effect (Utility class for ticket shapes) */
+  .ticket-cutout {
+    @apply relative;
+
+    &::before,
+    &::after {
+      content: '';
+      @apply absolute w-4 h-4 bg-dark-bg rounded-full top-1/2 -mt-2;
+    }
+
+    &::before {
+      left: -8px;
+    }
+
+    &::after {
+      right: -8px;
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Animations & Keyframes
+// -----------------------------------------------------------------------------
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+.spinner {
+  @apply w-10 h-10 border-4 border-gray-700 rounded-full border-t-primary-500 animate-spin;
+}
+
+// Scrollbar Styles
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-700 rounded-full hover:bg-gray-600;
+}

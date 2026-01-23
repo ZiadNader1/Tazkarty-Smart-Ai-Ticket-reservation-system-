@@ -1,0 +1,322 @@
+[
+  {
+    "train_number": "1010",
+    "train_type": "AC Russian",
+    "departure_time": "12:05 AM",
+    "arrival_time": "5:30 AM",
+    "duration": "05:25",
+    "stops": 7
+  },
+  {
+    "train_number": "1902",
+    "train_type": "AC",
+    "departure_time": "12:20 AM",
+    "arrival_time": "5:05 AM",
+    "duration": "04:45",
+    "stops": 2
+  },
+  {
+    "train_number": "3006",
+    "train_type": "AC Russian",
+    "departure_time": "12:50 AM",
+    "arrival_time": "6:14 AM",
+    "duration": "05:24",
+    "stops": 6
+  },
+  {
+    "train_number": "934",
+    "train_type": "VIP",
+    "departure_time": "1:10 AM",
+    "arrival_time": "6:20 AM",
+    "duration": "05:10",
+    "stops": 4
+  },
+  {
+    "train_number": "3502",
+    "train_type": "AC Russian",
+    "departure_time": "1:30 AM",
+    "arrival_time": "7:30 AM",
+    "duration": "06:00",
+    "stops": 18
+  },
+  {
+    "train_number": "974",
+    "train_type": "Russian",
+    "departure_time": "5:20 AM",
+    "arrival_time": "12:29 PM",
+    "duration": "07:09",
+    "stops": 27
+  },
+  {
+    "train_number": "1006",
+    "train_type": "Russian",
+    "departure_time": "6:00 AM",
+    "arrival_time": "11:40 AM",
+    "duration": "05:40",
+    "stops": 9
+  },
+  {
+    "train_number": "978",
+    "train_type": "AC Russian",
+    "departure_time": "6:30 AM",
+    "arrival_time": "12:50 PM",
+    "duration": "06:20",
+    "stops": 16
+  },
+  {
+    "train_number": "980",
+    "train_type": "VIP",
+    "departure_time": "8:00 AM",
+    "arrival_time": "1:15 PM",
+    "duration": "05:15",
+    "stops": 4
+  },
+  {
+    "train_number": "3008",
+    "train_type": "AC Russian",
+    "departure_time": "8:40 AM",
+    "arrival_time": "2:24 PM",
+    "duration": "05:44",
+    "stops": 8
+  },
+  {
+    "train_number": "80",
+    "train_type": "Russian",
+    "departure_time": "9:00 AM",
+    "arrival_time": "4:29 PM",
+    "duration": "07:29",
+    "stops": 25
+  },
+  {
+    "train_number": "1004",
+    "train_type": "AC Russian",
+    "departure_time": "9:30 AM",
+    "arrival_time": "2:40 PM",
+    "duration": "05:10",
+    "stops": 6
+  },
+  {
+    "train_number": "2010",
+    "train_type": "VIP",
+    "departure_time": "10:00 AM",
+    "arrival_time": "2:55 PM",
+    "duration": "04:55",
+    "stops": 3
+  },
+  {
+    "train_number": "158",
+    "train_type": "Russian",
+    "departure_time": "10:35 AM",
+    "arrival_time": "4:50 PM",
+    "duration": "06:15",
+    "stops": 15
+  },
+  {
+    "train_number": "982",
+    "train_type": "VIP",
+    "departure_time": "12:00 PM",
+    "arrival_time": "5:15 PM",
+    "duration": "05:15",
+    "stops": 6
+  },
+  {
+    "train_number": "160",
+    "train_type": "AC Russian",
+    "departure_time": "12:15 PM",
+    "arrival_time": "6:54 PM",
+    "duration": "06:39",
+    "stops": 17
+  },
+  {
+    "train_number": "998",
+    "train_type": "AC",
+    "departure_time": "1:00 PM",
+    "arrival_time": "6:35 PM",
+    "duration": "05:35",
+    "stops": 6
+  },
+  {
+    "train_number": "186",
+    "train_type": "AC Russian",
+    "departure_time": "1:30 PM",
+    "arrival_time": "7:45 PM",
+    "duration": "06:15",
+    "stops": 11
+  },
+  {
+    "train_number": "986",
+    "train_type": "AC",
+    "departure_time": "2:00 PM",
+    "arrival_time": "7:25 PM",
+    "duration": "05:25",
+    "stops": 8
+  },
+  {
+    "train_number": "162",
+    "train_type": "Russian",
+    "departure_time": "2:20 PM",
+    "arrival_time": "9:34 PM",
+    "duration": "07:14",
+    "stops": 27
+  },
+  {
+    "train_number": "164",
+    "train_type": "Russian",
+    "departure_time": "3:30 PM",
+    "arrival_time": "9:05 PM",
+    "duration": "05:35",
+    "stops": 5
+  },
+  {
+    "train_number": "990",
+    "train_type": "AC",
+    "departure_time": "4:00 PM",
+    "arrival_time": "9:55 PM",
+    "duration": "05:55",
+    "stops": 16
+  },
+  {
+    "train_number": "972",
+    "train_type": "Russian",
+    "departure_time": "4:20 PM",
+    "arrival_time": "11:24 PM",
+    "duration": "07:04",
+    "stops": 23
+  },
+  {
+    "train_number": "2006",
+    "train_type": "VIP",
+    "departure_time": "5:15 PM",
+    "arrival_time": "10:20 PM",
+    "duration": "05:05",
+    "stops": 3
+  },
+  {
+    "train_number": "2012",
+    "train_type": "AC Russian",
+    "departure_time": "5:30 PM",
+    "arrival_time": "10:35 PM",
+    "duration": "05:05",
+    "stops": 4
+  },
+  {
+    "train_number": "872",
+    "train_type": "AC Russian",
+    "departure_time": "5:45 PM",
+    "arrival_time": "11:55 PM",
+    "duration": "06:10",
+    "stops": 15
+  },
+  {
+    "train_number": "188",
+    "train_type": "Russian",
+    "departure_time": "6:00 PM",
+    "arrival_time": "12:45 AM",
+    "duration": "06:45",
+    "stops": 12
+  },
+  {
+    "train_number": "1014",
+    "train_type": "Russian",
+    "departure_time": "6:50 PM",
+    "arrival_time": "12:15 AM",
+    "duration": "05:25",
+    "stops": 7
+  },
+  {
+    "train_number": "2030",
+    "train_type": "Talgo",
+    "departure_time": "7:00 PM",
+    "arrival_time": "11:55 PM",
+    "duration": "04:55",
+    "stops": 3
+  },
+  {
+    "train_number": "988",
+    "train_type": "AC Russian",
+    "departure_time": "7:10 PM",
+    "arrival_time": "12:05 AM",
+    "duration": "04:55",
+    "stops": 4
+  },
+  {
+    "train_number": "1086",
+    "train_type": "Sleep",
+    "departure_time": "7:20 PM",
+    "arrival_time": "12:54 AM",
+    "duration": "05:34",
+    "stops": 1
+  },
+  {
+    "train_number": "86",
+    "train_type": "Sleep",
+    "departure_time": "7:45 PM",
+    "arrival_time": "12:55 AM",
+    "duration": "05:10",
+    "stops": 1
+  },
+  {
+    "train_number": "976",
+    "train_type": "VIP",
+    "departure_time": "8:00 PM",
+    "arrival_time": "1:10 AM",
+    "duration": "05:10",
+    "stops": 4
+  },
+  {
+    "train_number": "1012",
+    "train_type": "AC Russian",
+    "departure_time": "8:20 PM",
+    "arrival_time": "2:30 AM",
+    "duration": "06:10",
+    "stops": 9
+  },
+  {
+    "train_number": "2014",
+    "train_type": "AC",
+    "departure_time": "9:00 PM",
+    "arrival_time": "2:05 AM",
+    "duration": "05:05",
+    "stops": 3
+  },
+  {
+    "train_number": "82",
+    "train_type": "Sleep",
+    "departure_time": "9:10 PM",
+    "arrival_time": "2:19 AM",
+    "duration": "05:09",
+    "stops": 1
+  },
+  {
+    "train_number": "88",
+    "train_type": "AC",
+    "departure_time": "9:25 PM",
+    "arrival_time": "2:50 AM",
+    "duration": "05:25",
+    "stops": 9
+  },
+  {
+    "train_number": "996",
+    "train_type": "VIP",
+    "departure_time": "10:00 PM",
+    "arrival_time": "3:20 AM",
+    "duration": "05:20",
+    "stops": 4
+  },
+  {
+    "train_number": "90",
+    "train_type": "Russian",
+    "departure_time": "10:10 PM",
+    "arrival_time": "4:00 AM",
+    "duration": "05:50",
+    "stops": 9
+  },
+  {
+    "train_number": "1088",
+    "train_type": "Mix",
+    "departure_time": "10:20 PM",
+    "arrival_time": "3:30 AM",
+    "duration": "05:10",
+    "stops": 2
+  }
+]

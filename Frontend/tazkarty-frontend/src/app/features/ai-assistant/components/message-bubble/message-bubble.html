@@ -1,0 +1,39 @@
+<div
+  [class.justify-end]="sender === 'user'"
+  [class.justify-start]="sender === 'ai'"
+  class="flex"
+>
+  <div
+    [class.user-bubble]="sender === 'user'"
+    [class.ai-bubble]="sender === 'ai'"
+    class="bubble max-w-2xl"
+  >
+    <!-- Header -->
+    <div class="bubble-header">
+      @if (sender === 'ai') {
+        <span class="icon">🤖</span>
+        <span class="name">Nada</span>
+      } @else {
+        <span class="icon">👤</span>
+        <span class="name">You</span>
+      }
+    </div>
+
+    <!-- Content -->
+    @if (typing) {
+      <div class="typing">
+        <span class="dot" style="animation-delay: 0ms"></span>
+        <span class="dot" style="animation-delay: 150ms"></span>
+        <span class="dot" style="animation-delay: 300ms"></span>
+      </div>
+    } @else {
+      <p class="content">
+        {{ text }}
+      </p>
+
+      <p class="timestamp">
+        {{ timestamp | date:'shortTime' }}
+      </p>
+    }
+  </div>
+</div>

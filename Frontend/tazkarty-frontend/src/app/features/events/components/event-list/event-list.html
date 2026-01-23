@@ -1,0 +1,276 @@
+<div class="min-h-screen bg-black pb-12 text-gray-200">
+    <!-- Hero Section: Sports View (Video Background) -->
+    @if (isSportsView) {
+    <section class="relative h-[60vh] overflow-hidden">
+        <video #sportsVideo autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover"
+            (loadeddata)="sportsVideo.play()">
+            <source src="/football.mp4" type="video/mp4">
+        </video>
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+        <div class="relative z-10 flex flex-col items-center justify-center h-full text-center px-4 pt-16">
+            <h1 class="text-5xl md:text-7xl font-black text-white mb-4 uppercase tracking-tighter drop-shadow-2xl">
+                {{ langService.translate('events.sports_title') }} <span class="text-primary-500">{{
+                    langService.translate('sports.events') }}</span>
+            </h1>
+            <p class="text-xl text-gray-200 font-medium max-w-2xl mx-auto drop-shadow-lg">
+                {{ langService.translate('events.sports_subtitle') }}
+            </p>
+        </div>
+    </section>
+    } @else if (isEntertainmentView) {
+    <!-- Hero Section: Entertainment View (Video Background) -->
+    <section class="relative h-[60vh] overflow-hidden">
+        <video #entVideo autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover"
+            (loadeddata)="entVideo.play()">
+            <source src="/entertainment.mp4" type="video/mp4">
+        </video>
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+        <div class="relative z-10 flex flex-col items-center justify-center h-full text-center px-4 pt-16">
+            <h1 class="text-5xl md:text-7xl font-black text-white mb-4 uppercase tracking-tighter drop-shadow-2xl">
+                {{ langService.translate('events.ent_title') }} <span class="text-primary-500">{{
+                    langService.translate('ent.shows') }}</span>
+            </h1>
+            <p class="text-xl text-gray-200 font-medium max-w-2xl mx-auto drop-shadow-lg">
+                {{ langService.translate('events.ent_subtitle') }}
+            </p>
+        </div>
+    </section>
+    } @else {
+    <!-- Hero Section: Default View -->
+    <div
+        class="bg-gradient-to-r from-primary-900 to-primary-700 text-white min-h-[300px] flex items-center relative overflow-hidden">
+        <!-- Abstract Background Pattern -->
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute -top-20 -left-20 w-96 h-96 rounded-full bg-white blur-3xl mix-blend-overlay"></div>
+            <div class="absolute bottom-0 right-0 w-80 h-80 rounded-full bg-white blur-3xl mix-blend-overlay"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10 py-12">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">{{ langService.translate('events.discover_title') }}</h1>
+            <p class="text-xl text-primary-100 max-w-2xl">
+                {{ langService.translate('events.discover_subtitle') }}
+            </p>
+        </div>
+    </div>
+    }
+
+    <!-- Content Container -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20"
+        [class.-mt-16]="!isSportsView && !isEntertainmentView" [class.-mt-32]="isSportsView || isEntertainmentView">
+
+        <!-- Filters (Sticky Desktop) -->
+        <div class="mb-8 sticky top-[74px] z-40">
+            @if (!isSportsView) {
+            <app-event-filters (filterChange)="onFilterChange($event)"></app-event-filters>
+            } @else {
+            <!-- Sports Matches Header & Filters -->
+            <div class="bg-dark-card/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 p-6">
+                <!-- Filter Header Removed as per request -->
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <!-- Team Filter -->
+                    <div class="md:col-span-1">
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">
+                            {{ langService.translate('events.choose_team') }}
+                        </label>
+                        <div class="relative group">
+                            <select [value]="activeFilter.team || 'All'" (change)="onSportsFilterChange('team', $event)"
+                                class="w-full pl-4 pr-10 py-3 bg-gray-900/50 border border-gray-700 text-white rounded-xl appearance-none focus:outline-none focus:ring-2 focus:ring-primary-500/50 text-sm transition-all hover:border-gray-600 cursor-pointer">
+                                <option value="All">{{ langService.translate('events.all_teams') }}</option>
+                                @for (team of teams(); track team) {
+                                <option [value]="team">{{ langService.translate('team.' + team) }}</option>
+                                }
+                            </select>
+                            <div
+                                class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-gray-500 group-hover:text-primary-500 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stadium Filter -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">{{
+                            langService.translate('events.stadium') }}</label>
+                        <div class="relative group">
+                            <select [value]="activeFilter.stadium || 'All'"
+                                (change)="onSportsFilterChange('stadium', $event)"
+                                class="w-full pl-4 pr-10 py-3 bg-gray-900/50 border border-gray-700 text-white rounded-xl appearance-none focus:outline-none focus:ring-2 focus:ring-primary-500/50 text-sm transition-all hover:border-gray-600 cursor-pointer">
+                                <option value="All">{{ langService.translate('events.all_stadiums') }}</option>
+                                @for (stadium of stadiums(); track stadium) {
+                                <option [value]="stadium">{{ langService.translate('stadium.' + stadium) }}</option>
+                                }
+                            </select>
+                            <div
+                                class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-gray-500 group-hover:text-primary-500 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tournament Type Filter -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">{{
+                            langService.translate('events.tournament') }}</label>
+                        <div class="relative group">
+                            <select [value]="activeFilter.championship_type || 'All'"
+                                (change)="onSportsFilterChange('championship_type', $event)"
+                                class="w-full pl-4 pr-10 py-3 bg-gray-900/50 border border-gray-700 text-white rounded-xl appearance-none focus:outline-none focus:ring-2 focus:ring-primary-500/50 text-sm transition-all hover:border-gray-600 cursor-pointer">
+                                <option value="All">{{ langService.translate('events.all_tournaments') }}</option>
+                                @for (type of tournamentTypes(); track type) {
+                                <option [value]="type">{{ langService.translate('tournament.' + type) }}</option>
+                                }
+                            </select>
+                            <div
+                                class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-gray-500 group-hover:text-primary-500 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Clear Button -->
+                    <div class="flex items-end">
+                        <button (click)="resetFilters()"
+                            class="w-full py-3 bg-gray-800 hover:bg-red-500/10 hover:text-red-500 border border-gray-700 hover:border-red-500/50 text-gray-400 rounded-xl transition-all flex items-center justify-center gap-2 text-sm font-bold shadow-sm"
+                            title="Clear Filters">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            {{ langService.translate('events.clear_filters') }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+            }
+        </div>
+
+        <!-- Results Info -->
+        <div class="flex justify-between items-center mb-6 px-2">
+            <div>
+                <h2 class="text-xl font-bold text-white">
+                    {{ totalResults }} {{ langService.translate('events.events_found') }}
+                </h2>
+                <div class="flex gap-2 text-sm mt-1">
+                    @for (tag of activeTags; track tag) {
+                    <span
+                        class="bg-primary-500/10 text-primary-400 px-3 py-1 rounded-full border border-primary-500/20 flex items-center gap-2 text-xs font-medium">
+                        {{ tag }}
+                        <button (click)="removeTag(tag)"
+                            class="hover:text-red-400 transition-colors ml-1 font-bold">×</button>
+                    </span>
+                    }
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button (click)="viewMode = 'grid'" class="p-2 rounded-lg transition-colors"
+                    [class.bg-gray-800]="viewMode === 'grid'" [class.shadow-lg]="viewMode === 'grid'"
+                    [class.text-primary-500]="viewMode === 'grid'" [class.text-gray-500]="viewMode !== 'grid'">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                    </svg>
+                </button>
+                <button (click)="viewMode = 'list'" class="p-2 rounded-lg transition-colors"
+                    [class.bg-gray-800]="viewMode === 'list'" [class.shadow-lg]="viewMode === 'list'"
+                    [class.text-primary-500]="viewMode === 'list'" [class.text-gray-500]="viewMode !== 'list'">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading State (Skeletons) -->
+        @if (loading()) {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            @for (i of [1,2,3,4,5,6,7,8]; track i) {
+            <div class="bg-dark-card rounded-2xl p-4 shadow-lg border border-gray-800 h-96 animate-pulse flex flex-col">
+                <div class="w-full h-48 bg-gray-800 rounded-xl mb-4"></div>
+                <div class="h-4 bg-gray-800 rounded w-3/4 mb-2"></div>
+                <div class="h-3 bg-gray-800 rounded w-1/2 mb-4"></div>
+                <div class="mt-auto flex justify-between">
+                    <div class="h-8 w-20 bg-gray-800 rounded"></div>
+                    <div class="h-8 w-24 bg-gray-800 rounded"></div>
+                </div>
+            </div>
+            }
+        </div>
+        }
+
+        <!-- Empty State -->
+        @if (!loading() && events().length === 0) {
+        <div class="text-center py-24 bg-dark-card rounded-3xl border border-gray-800 shadow-xl">
+            <div class="inline-block p-6 bg-gray-900 rounded-full mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-700" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-200 mb-2">
+                {{ isSportsView ? langService.translate('events.no_matches') : langService.translate('events.no_events')
+                }}
+            </h3>
+            <p class="text-gray-500 max-w-md mx-auto mb-8">
+                {{ isSportsView ? langService.translate('events.no_matches_desc') :
+                langService.translate('events.no_events_desc') }}
+            </p>
+            <button (click)="resetFilters()"
+                class="px-6 py-3 bg-primary-600 text-white rounded-xl font-bold hover:bg-primary-700 transition">
+                {{ langService.translate('events.clear_filters') }}
+            </button>
+        </div>
+        }
+
+        <!-- Events Grid -->
+        @if (!loading() && events().length > 0) {
+        <div [class.grid]="viewMode === 'grid'" [class.grid-cols-1]="viewMode === 'grid'"
+            [class.md:grid-cols-2]="viewMode === 'grid'" [class.lg:grid-cols-3]="viewMode === 'grid'"
+            [class.xl:grid-cols-4]="viewMode === 'grid'" [class.gap-6]="viewMode === 'grid'"
+            [class.space-y-4]="viewMode === 'list'">
+
+            @for (event of events(); track $index) {
+            <div [class.h-full]="viewMode === 'grid'">
+                <app-event-card [event]="event"></app-event-card>
+            </div>
+            }
+        </div>
+
+        <!-- Pagination -->
+        <div class="mt-12 flex justify-center items-center gap-2">
+            <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1"
+                class="px-4 py-2 bg-dark-card border border-gray-800 text-white rounded-lg disabled:opacity-30 hover:bg-gray-800 transition">
+                {{ langService.translate('events.previous') }}
+            </button>
+
+            <div class="flex items-center gap-1 px-4 text-sm font-medium text-gray-400">
+                {{ langService.translate('events.page') }} <span class="text-primary-500">{{ currentPage }}</span> {{
+                langService.translate('events.of') }} {{ totalPages }}
+            </div>
+
+            <button (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages"
+                class="px-4 py-2 bg-dark-card border border-gray-800 text-white rounded-lg disabled:opacity-30 hover:bg-gray-800 transition">
+                {{ langService.translate('events.next') }}
+            </button>
+        </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,366 @@
+<div class="min-h-screen bg-gray-50 dark:bg-dark-bg p-8 transition-colors duration-300">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+      <div>
+        <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-primary-600 dark:text-primary-400" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+          {{ langService.translate('admin.event_mgmt') }}
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400">{{ langService.translate('admin.event_mgmt_desc') }}</p>
+      </div>
+
+      <div class="flex gap-3">
+        <a routerLink="/admin/dashboard"
+          class="px-6 py-4 bg-white dark:bg-dark-card text-gray-700 dark:text-gray-300 font-bold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-800 transition-all transform hover:scale-105 shadow-md flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          {{ langService.translate('admin.dashboard') }}
+        </a>
+        <button (click)="openCreateModal()"
+          class="px-8 py-4 bg-gradient-to-r from-primary-600 to-secondary-600 text-white font-bold rounded-xl hover:from-primary-700 hover:to-secondary-700 transition-all transform hover:scale-105 shadow-lg flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          {{ langService.translate('admin.create_event') }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Filters Bar -->
+    <div class="bg-white dark:bg-dark-card rounded-2xl shadow-xl p-6 mb-8 border border-gray-100 dark:border-gray-800">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <!-- Search -->
+        <div class="md:col-span-2">
+          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{
+            langService.translate('admin.title') }}</label>
+          <div class="relative">
+            <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
+              [placeholder]="langService.translate('admin.search_placeholder')"
+              class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition text-gray-900 dark:text-white" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute left-3 top-3.5 text-gray-400" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- City Filter -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{
+            langService.translate('admin.all_cities') }}</label>
+          <select [ngModel]="filterCity()" (ngModelChange)="filterCity.set($event)"
+            class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition text-gray-900 dark:text-white">
+            <option value="all">{{ langService.translate('admin.all_cities') }}</option>
+            @for (city of uniqueCities(); track city) {
+            <option [value]="city">{{ city }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Championship Filter -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{
+            langService.translate('admin.all_championships') }}</label>
+          <select [ngModel]="filterChampionship()" (ngModelChange)="filterChampionship.set($event)"
+            class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition text-gray-900 dark:text-white">
+            <option value="all">{{ langService.translate('admin.all_championships') }}</option>
+            @for (champ of uniqueChampionships; track champ) {
+            <option [value]="champ">{{ champ }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Events Grid -->
+    @if (loading()) {
+    <div class="text-center py-20">
+      <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-primary-600 mx-auto mb-4"></div>
+      <p class="text-gray-600 dark:text-gray-400 text-lg">{{ langService.translate('admin.loading_events') }}</p>
+    </div>
+    } @else {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (event of filteredEvents(); track event._id) {
+      <div
+        class="bg-white dark:bg-dark-card rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all transform hover:-translate-y-2 duration-300 border border-gray-100 dark:border-gray-800">
+        <!-- Event Image -->
+        <div class="relative h-48 bg-gradient-to-br from-primary-400 to-secondary-400">
+          @if (event.poster_url) {
+          <img [src]="event.poster_url" [alt]="event.title" class="w-full h-full object-cover">
+          } @else {
+          <div class="w-full h-full flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-white bg-opacity-30" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          }
+
+          <!-- Status Badge -->
+          <div class="absolute top-3 right-3">
+            @if (event.is_active) {
+            <span class="px-3 py-1 bg-green-500 text-white rounded-full text-xs font-bold shadow-lg">
+              {{ langService.translate('admin.active_badge') }}
+            </span>
+            } @else {
+            <span class="px-3 py-1 bg-red-500 text-white rounded-full text-xs font-bold shadow-lg">
+              {{ langService.translate('admin.inactive_badge') }}
+            </span>
+            }
+          </div>
+
+          <!-- Featured Badge -->
+          @if (event.is_featured) {
+          <div class="absolute top-3 left-3">
+            <span
+              class="px-3 py-1 bg-yellow-400 text-gray-900 rounded-full text-xs font-bold shadow-lg flex items-center gap-1">
+              {{ langService.translate('admin.featured_badge') }}
+            </span>
+          </div>
+          }
+        </div>
+
+        <!-- Event Info -->
+        <div class="p-6">
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-1">
+            {{ event.title }}
+          </h3>
+          <p class="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
+            {{ event.description }}
+          </p>
+
+          <!-- Meta Info -->
+          <div class="flex flex-col gap-2 text-sm text-gray-500 dark:text-gray-400 mb-4">
+            <div class="flex items-center gap-2">
+              @if (event.stadium_id) {
+              @let stadium = getStadiumInfo(event.stadium_id);
+              @if (stadium) {
+              <span
+                class="flex items-center gap-1 text-xs font-semibold bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                {{ stadium.name }}
+              </span>
+              }
+              }
+              @if (event.championship_type) {
+              <span
+                class="flex items-center gap-1 text-xs font-semibold bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-1 rounded">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                </svg>
+                {{ event.championship_type }}
+              </span>
+              }
+            </div>
+            <div class="flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              {{ event.release_date | date:'shortDate' }}
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex gap-2">
+            <button (click)="openEditModal(event)"
+              class="flex-1 py-2 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900 transition font-semibold flex items-center justify-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+              {{ langService.translate('admin.edit') }}
+            </button>
+
+            <button (click)="deleteEvent(event._id)"
+              class="py-2 px-4 bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 rounded-lg hover:bg-red-200 dark:hover:bg-red-900 transition font-semibold flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      } @empty {
+      <div
+        class="col-span-full text-center py-20 bg-white dark:bg-dark-card rounded-2xl shadow-lg border border-gray-100 dark:border-gray-800">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 text-gray-400 mx-auto mb-4" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+        </svg>
+        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{
+          langService.translate('admin.no_events_found') }}</h3>
+        <p class="text-gray-600 dark:text-gray-400">{{ langService.translate('admin.adjust_filters') }}</p>
+      </div>
+      }
+    </div>
+    }
+  </div>
+</div>
+
+<!-- Modal -->
+@if (showModal()) {
+<div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[40]" (click)="closeModal()"></div>
+<div class="fixed inset-0 flex items-center justify-center z-50 p-4" (click)="closeModal()">
+  <div
+    class="bg-white dark:bg-dark-card rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-100 dark:border-gray-800"
+    (click)="$event.stopPropagation()">
+    <!-- Modal Header -->
+    <div class="bg-gradient-to-r from-primary-600 to-secondary-600 text-white p-6 rounded-t-3xl">
+      <div class="flex justify-between items-center">
+        <h2 class="text-2xl font-bold flex items-center gap-2">
+          {{ editMode() ? langService.translate('admin.edit') : langService.translate('admin.create') }}
+        </h2>
+        <button (click)="closeModal()" class="text-white hover:text-gray-200 text-3xl">×</button>
+      </div>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="p-6 space-y-4">
+      <!-- Title -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{
+          langService.translate('admin.title') }}</label>
+        <input type="text" [(ngModel)]="eventForm.title" placeholder="..."
+          class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition text-gray-900 dark:text-white" />
+      </div>
+
+      <!-- Description -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{
+          langService.translate('admin.description') }}</label>
+        <textarea [(ngModel)]="eventForm.description" rows="3" placeholder="..."
+          class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition text-gray-900 dark:text-white"></textarea>
+      </div>
+
+      <!-- Poster Upload -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{
+          langService.translate('admin.poster') }}</label>
+        <input type="file" (change)="onPosterSelected($event)" accept="image/*"
+          class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 dark:file:bg-blue-900/40 file:text-blue-700 dark:file:text-blue-300 hover:file:bg-blue-100 transition" />
+      </div>
+
+      <!-- Sports Specific Fields -->
+      @if (eventForm.type === 'sports') {
+      <div
+        class="bg-blue-50 dark:bg-blue-900/10 p-4 rounded-xl border border-blue-100 dark:border-blue-900/30 space-y-4">
+        <h3 class="font-bold text-blue-800 dark:text-blue-400 flex items-center gap-2">
+          {{ langService.translate('admin.match_details') }}
+        </h3>
+
+        <!-- Stadium Selection -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{
+            langService.translate('admin.stadium') }}</label>
+          <select [(ngModel)]="eventForm.stadium_id" (ngModelChange)="onStadiumChange($event)"
+            class="w-full px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-gray-900 dark:text-white">
+            <option value="" disabled>Select Stadium</option>
+            @for (stadium of activeStadiums(); track stadium._id) {
+            <option [value]="stadium._id">{{ stadium.name }} (Cap: {{ stadium.capacity }})</option>
+            }
+          </select>
+        </div>
+
+        <!-- Teams -->
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{
+              langService.translate('admin.home_team') }}</label>
+            <select [(ngModel)]="eventForm.home_team"
+              class="w-full px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-gray-900 dark:text-white">
+              <option value="">Select Club</option>
+              @for (team of egyptianLeagueTeams; track team) {
+              <option [value]="team">{{ team }}</option>
+              }
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{
+              langService.translate('admin.away_team') }}</label>
+            <select [(ngModel)]="eventForm.away_team"
+              class="w-full px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-gray-900 dark:text-white">
+              <option value="">Select Club</option>
+              @for (team of egyptianLeagueTeams; track team) {
+              <option [value]="team">{{ team }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <!-- Capacities -->
+        <div class="grid grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{
+              langService.translate('admin.total_cap') }}</label>
+            <input type="number" [(ngModel)]="eventForm.total_capacity"
+              class="w-full px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-gray-900 dark:text-white" />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{
+              langService.translate('admin.home_cap') }}</label>
+            <input type="number" [(ngModel)]="eventForm.home_capacity"
+              class="w-full px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-gray-900 dark:text-white" />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{
+              langService.translate('admin.away_cap') }}</label>
+            <input type="number" [(ngModel)]="eventForm.away_capacity"
+              class="w-full px-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-gray-900 dark:text-white" />
+          </div>
+        </div>
+      </div>
+      }
+
+      <!-- Release Date -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{
+          langService.translate('admin.release_date') }}</label>
+        <input type="date" [(ngModel)]="eventForm.release_date"
+          class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition text-gray-900 dark:text-white" />
+      </div>
+
+      <!-- Active Status -->
+      <div
+        class="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700">
+        <input type="checkbox" id="is_active" [(ngModel)]="eventForm.is_active"
+          class="w-5 h-5 text-primary-600 border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500" />
+        <label for="is_active" class="font-semibold text-gray-700 dark:text-gray-300 cursor-pointer">
+          {{ langService.translate('admin.active_badge') }}
+        </label>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="p-6 border-t dark:border-gray-800 flex gap-3">
+      <button (click)="closeModal()"
+        class="flex-1 py-3 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-700 transition font-bold">
+        {{ langService.translate('admin.cancel') }}
+      </button>
+      <button (click)="saveEvent()"
+        class="flex-1 py-3 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-xl hover:from-primary-700 hover:to-secondary-700 transition font-bold">
+        {{ editMode() ? langService.translate('admin.update') : langService.translate('admin.create') }}
+      </button>
+    </div>
+  </div>
+</div>
+}

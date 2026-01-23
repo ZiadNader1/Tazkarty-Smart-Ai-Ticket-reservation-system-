@@ -1,0 +1,284 @@
+<div class="min-h-screen bg-dark-bg p-4 md:p-8" [dir]="langService.currentLang() === 'ar' ? 'rtl' : 'ltr'">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
+      <div>
+        <h1 class="text-4xl font-extrabold text-white mb-2 flex items-center gap-3">
+          <span class="p-2 bg-primary-600/20 rounded-lg text-primary-500">📊</span>
+          {{ t('admin.analytics.title') }}
+        </h1>
+        <p class="text-gray-400 text-lg">{{ t('admin.analytics.subtitle') }}</p>
+      </div>
+
+      <div class="flex flex-wrap gap-3 w-full md:w-auto">
+        <!-- Dashboard Button -->
+        <a routerLink="/admin/dashboard" class="btn btn-secondary flex items-center gap-2">
+          <span [class.rotate-180]="langService.currentLang() === 'ar'">←</span>
+          {{ t('admin.dashboard') }}
+        </a>
+
+        <!-- Period Selector -->
+        <div class="bg-gray-900 border border-gray-800 rounded-xl p-1 flex gap-1">
+          <button (click)="selectPeriod('week')" [class.bg-primary-600]="selectedPeriod() === 'week'"
+            [class.text-white]="selectedPeriod() === 'week'" [class.text-gray-400]="selectedPeriod() !== 'week'"
+            class="px-4 py-2 rounded-lg font-semibold transition-all hover:text-white">
+            {{ t('admin.analytics.period.week') }}
+          </button>
+          <button (click)="selectPeriod('month')" [class.bg-primary-600]="selectedPeriod() === 'month'"
+            [class.text-white]="selectedPeriod() === 'month'" [class.text-gray-400]="selectedPeriod() !== 'month'"
+            class="px-4 py-2 rounded-lg font-semibold transition-all hover:text-white">
+            {{ t('admin.analytics.period.month') }}
+          </button>
+          <button (click)="selectPeriod('year')" [class.bg-primary-600]="selectedPeriod() === 'year'"
+            [class.text-white]="selectedPeriod() === 'year'" [class.text-gray-400]="selectedPeriod() !== 'year'"
+            class="px-4 py-2 rounded-lg font-semibold transition-all hover:text-white">
+            {{ t('admin.analytics.period.year') }}
+          </button>
+        </div>
+
+        <!-- Export Button -->
+        <button (click)="exportData()"
+          class="btn bg-green-600/10 text-green-500 border border-green-600/20 hover:bg-green-600/20">
+          <span class="mr-2">📤</span>
+          {{ t('admin.analytics.export') }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      <!-- Total Revenue -->
+      <div class="card card-highlight border-l-green-500 bg-gradient-to-br from-gray-900 to-gray-800">
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <p class="text-gray-400 text-sm font-medium mb-1">{{ t('admin.analytics.total_revenue') }}</p>
+            <h3 class="text-3xl font-bold text-white">{{ totalRevenue().toLocaleString() }} <span
+                class="text-sm font-normal text-gray-500">{{ t('common.egp') }}</span></h3>
+          </div>
+          <div class="bg-green-500/10 rounded-xl p-3 text-green-500">
+            <span class="text-2xl">💰</span>
+          </div>
+        </div>
+        <div class="flex items-center text-sm">
+          <span class="text-green-500 flex items-center gap-1 font-medium">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6">
+              </path>
+            </svg>
+            +15.3%
+          </span>
+          <span class="text-gray-500 ml-2"> {{ t('admin.analytics.growth') }}</span>
+        </div>
+      </div>
+
+      <!-- Total Bookings -->
+      <div class="card card-highlight border-l-blue-500 bg-gradient-to-br from-gray-900 to-gray-800">
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <p class="text-gray-400 text-sm font-medium mb-1">{{ t('admin.analytics.total_bookings') }}</p>
+            <h3 class="text-3xl font-bold text-white">{{ totalBookings().toLocaleString() }}</h3>
+          </div>
+          <div class="bg-blue-500/10 rounded-xl p-3 text-blue-500">
+            <span class="text-2xl">🎫</span>
+          </div>
+        </div>
+        <div class="flex items-center text-sm">
+          <span class="text-green-500 flex items-center gap-1 font-medium">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6">
+              </path>
+            </svg>
+            +8.2%
+          </span>
+          <span class="text-gray-500 ml-2"> {{ t('admin.analytics.growth') }}</span>
+        </div>
+      </div>
+
+      <!-- Average Ticket Price -->
+      <div class="card card-highlight border-l-purple-500 bg-gradient-to-br from-gray-900 to-gray-800">
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <p class="text-gray-400 text-sm font-medium mb-1">{{ t('admin.analytics.avg_price') }}</p>
+            <h3 class="text-3xl font-bold text-white">{{ averageTicketPrice() }} <span
+                class="text-sm font-normal text-gray-500">{{ t('common.egp') }}</span></h3>
+          </div>
+          <div class="bg-purple-500/10 rounded-xl p-3 text-purple-500">
+            <span class="text-2xl">💵</span>
+          </div>
+        </div>
+        <div class="flex items-center text-sm">
+          <span class="text-green-500 flex items-center gap-1 font-medium">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6">
+              </path>
+            </svg>
+            +3.7%
+          </span>
+          <span class="text-gray-500 ml-2"> {{ t('admin.analytics.growth') }}</span>
+        </div>
+      </div>
+
+      <!-- Conversion Rate -->
+      <div class="card card-highlight border-l-orange-500 bg-gradient-to-br from-gray-900 to-gray-800">
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <p class="text-gray-400 text-sm font-medium mb-1">{{ t('admin.analytics.conv_rate') }}</p>
+            <h3 class="text-3xl font-bold text-white">{{ conversionRate() }}%</h3>
+          </div>
+          <div class="bg-orange-500/10 rounded-xl p-3 text-orange-500">
+            <span class="text-2xl">📈</span>
+          </div>
+        </div>
+        <div class="flex items-center text-sm">
+          <span class="text-green-500 flex items-center gap-1 font-medium">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6">
+              </path>
+            </svg>
+            +5.1%
+          </span>
+          <span class="text-gray-500 ml-2"> {{ t('admin.analytics.growth') }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+      <!-- Revenue Trends -->
+      <div class="lg:col-span-2">
+        <div class="card bg-gray-900 border-gray-800 h-full">
+          <div class="flex justify-between items-center mb-8">
+            <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+              <span class="w-2 h-8 bg-primary-600 rounded-full"></span>
+              {{ t('admin.analytics.revenue_trends') }}
+            </h2>
+          </div>
+
+          <!-- Chart -->
+          <div class="h-[400px] relative">
+            @if(loading()) {
+            <div
+              class="absolute inset-0 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm z-10 rounded-xl">
+              <div class="spinner"></div>
+            </div>
+            }
+            <canvas baseChart [data]="lineChartData" [options]="lineChartOptions" [type]="'line'">
+            </canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category Breakdown -->
+      <div class="lg:col-span-1">
+        <div class="card bg-gray-900 border-gray-800 h-full flex flex-col">
+          <h2 class="text-2xl font-bold text-white mb-8 flex items-center gap-3">
+            <span class="w-2 h-8 bg-blue-600 rounded-full"></span>
+            {{ t('admin.analytics.category_breakdown') }}
+          </h2>
+
+          <div class="flex-1 relative min-h-[300px]">
+            @if(loading()) {
+            <div
+              class="absolute inset-0 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm z-10 rounded-xl">
+              <div class="spinner"></div>
+            </div>
+            }
+            <canvas baseChart [data]="pieChartData" [options]="pieChartOptions" [type]="'pie'">
+            </canvas>
+          </div>
+
+          <!-- Total Info -->
+          <div class="mt-8 p-4 bg-gray-800/50 rounded-xl border border-gray-700/50">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-400">{{ t('admin.analytics.total_bookings') }}</span>
+              <span class="text-2xl font-bold text-primary-500">
+                {{ stats().totalBookings.toLocaleString() }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Performing Events Table -->
+    <div class="card bg-gray-900 border-gray-800 overflow-hidden">
+      <div class="p-6 border-b border-gray-800 flex justify-between items-center">
+        <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+          <span class="w-2 h-8 bg-orange-600 rounded-full"></span>
+          {{ t('admin.analytics.top_events') }}
+        </h2>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="bg-gray-800/50">
+              <th class="text-left py-4 px-6 font-semibold text-gray-400 uppercase tracking-wider text-xs">{{
+                t('admin.analytics.rank') }}</th>
+              <th class="text-left py-4 px-6 font-semibold text-gray-400 uppercase tracking-wider text-xs">{{
+                t('admin.analytics.event_name') }}</th>
+              <th class="text-left py-4 px-6 font-semibold text-gray-400 uppercase tracking-wider text-xs">{{
+                t('admin.role') }}</th>
+              <th class="text-right py-4 px-6 font-semibold text-gray-400 uppercase tracking-wider text-xs">{{
+                t('admin.analytics.bookings') }}</th>
+              <th class="text-right py-4 px-6 font-semibold text-gray-400 uppercase tracking-wider text-xs">{{
+                t('admin.analytics.revenue') }}</th>
+              <th class="text-right py-4 px-6 font-semibold text-gray-400 uppercase tracking-wider text-xs">{{
+                t('admin.analytics.avg_ticket') }}</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-800">
+            @for (event of topEvents(); track event.name; let i = $index) {
+            <tr class="hover:bg-gray-800/30 transition-colors group">
+              <td class="py-5 px-6">
+                <div class="flex items-center gap-3">
+                  @if (i === 0) {
+                  <span
+                    class="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-500/10 text-yellow-500 text-lg">🥇</span>
+                  } @else if (i === 1) {
+                  <span
+                    class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-400/10 text-gray-400 text-lg">🥈</span>
+                  } @else if (i === 2) {
+                  <span
+                    class="flex items-center justify-center w-8 h-8 rounded-full bg-orange-500/10 text-orange-500 text-lg">🥉</span>
+                  } @else {
+                  <span class="text-gray-600 font-bold ml-3">{{ i + 1 }}</span>
+                  }
+                </div>
+              </td>
+              <td class="py-5 px-6">
+                <span class="font-semibold text-white group-hover:text-primary-400 transition-colors">{{ event.name
+                  }}</span>
+              </td>
+              <td class="py-5 px-6">
+                <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight"
+                  [class.bg-blue-500/10]="event.category === 'movie'" [class.text-blue-500]="event.category === 'movie'"
+                  [class.bg-purple-500/10]="event.category === 'concert'"
+                  [class.text-purple-500]="event.category === 'concert'"
+                  [class.bg-green-500/10]="event.category === 'sports'"
+                  [class.text-green-500]="event.category === 'sports'"
+                  [class.bg-orange-500/10]="event.category === 'show'"
+                  [class.text-orange-500]="event.category === 'show'"
+                  [class.bg-pink-500/10]="event.category === 'entertainment'"
+                  [class.text-pink-500]="event.category === 'entertainment'">
+                  {{ t(event.category) }}
+                </span>
+              </td>
+              <td class="py-5 px-6 text-right">
+                <span class="text-gray-300 font-medium">{{ event.bookings.toLocaleString() }}</span>
+              </td>
+              <td class="py-5 px-6 text-right">
+                <span class="text-primary-500 font-bold">{{ event.revenue.toLocaleString() }} <span
+                    class="text-[10px] font-normal opacity-70">{{ t('common.egp') }}</span></span>
+              </td>
+              <td class="py-5 px-6 text-right text-gray-400 text-sm">
+                {{ (event.revenue / event.bookings).toFixed(1) }}
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

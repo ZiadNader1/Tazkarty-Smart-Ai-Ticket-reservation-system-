@@ -1,0 +1,590 @@
+<div class="min-h-screen bg-gray-50 dark:bg-dark-bg p-8 transition-colors duration-300">
+  <div class="max-w-7xl mx-auto">
+
+    <!-- Header Section -->
+    <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 animate-fade-in">
+      <div>
+        <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-primary-600 dark:text-primary-400" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+          {{ langService.translate('admin.venue_mgmt') }}
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400 text-lg">{{ langService.translate('admin.venue_mgmt_desc') }}</p>
+      </div>
+
+      <div class="flex gap-3">
+        <a routerLink="/admin/dashboard"
+          class="px-6 py-4 bg-white dark:bg-dark-card text-gray-700 dark:text-gray-300 font-bold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-800 transition-all transform hover:scale-105 shadow-md flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          {{ langService.translate('admin.dashboard') }}
+        </a>
+        <button (click)="openAddModal()"
+          class="px-8 py-4 bg-gradient-to-r from-primary-600 to-secondary-600 text-white font-bold rounded-xl hover:from-primary-700 hover:to-secondary-700 transition-all transform hover:scale-105 shadow-lg flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          {{ langService.translate('admin.add_venue') }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Alerts -->
+    @if (successMessage) {
+    <div class="mb-6 p-4 bg-green-50 dark:bg-green-900/10 border-l-4 border-green-500 rounded-lg shadow-sm">
+      <div class="flex items-center gap-3 text-green-800 dark:text-green-400 font-bold">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        {{ successMessage }}
+      </div>
+    </div>
+    }
+
+    @if (error) {
+    <div class="mb-6 p-4 bg-red-50 dark:bg-red-900/10 border-l-4 border-red-500 rounded-lg shadow-sm">
+      <div class="flex items-center gap-3 text-red-800 dark:text-red-400 font-bold">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        {{ error }}
+      </div>
+    </div>
+    }
+
+    <!-- Filters Bar -->
+    <div class="bg-white dark:bg-dark-card rounded-2xl shadow-xl p-6 mb-8 border border-gray-100 dark:border-gray-800">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Search -->
+        <div class="md:col-span-2">
+          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{
+            langService.translate('admin.search_venues') }}</label>
+          <div class="relative">
+            <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange()"
+              [placeholder]="langService.translate('admin.search_venues_placeholder')"
+              class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition text-gray-900 dark:text-white" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute left-3 top-3.5 text-gray-400" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Status Filter -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{
+            langService.translate('admin.status_filter') }}</label>
+          <select [(ngModel)]="filterActive" (ngModelChange)="onFilterChange()"
+            class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition text-gray-900 dark:text-white font-semibold">
+            <option value="all">{{ langService.translate('admin.all_venues') }}</option>
+            <option value="active">{{ langService.translate('admin.active_only') }}</option>
+            <option value="inactive">{{ langService.translate('admin.inactive_only') }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Venues Grid -->
+    @if (loading && !venues.length) {
+    <div class="text-center py-20">
+      <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-primary-600 mx-auto mb-4"></div>
+      <p class="text-gray-600 dark:text-gray-400 text-lg">{{ langService.translate('admin.loading_venues') }}</p>
+    </div>
+    } @else {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (venue of filteredVenues; track venue._id) {
+      <div
+        class="bg-white dark:bg-dark-card rounded-2xl shadow-lg border border-gray-100 dark:border-gray-800 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 flex flex-col">
+
+        <!-- Venue Top Image & Status -->
+        <div class="relative h-48 bg-gray-200 dark:bg-gray-800">
+          @if (venue.image) {
+          <img [src]="venue.image" [alt]="venue.name" class="w-full h-full object-cover">
+          } @else {
+          <div class="w-full h-full flex items-center justify-center text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+          </div>
+          }
+
+          <div class="absolute top-4 right-4">
+            @if (venue.is_active) {
+            <span
+              class="px-3 py-1 bg-green-500 text-white rounded-full text-xs font-bold shadow-lg flex items-center gap-1">
+              <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
+              {{ langService.translate('admin.active_badge') }}
+            </span>
+            } @else {
+            <span
+              class="px-3 py-1 bg-red-500 text-white rounded-full text-xs font-bold shadow-lg flex items-center gap-1">
+              {{ langService.translate('admin.inactive_badge') }}
+            </span>
+            }
+          </div>
+        </div>
+
+        <!-- Card Content -->
+        <div class="p-6 flex-1 flex flex-col">
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-1 line-clamp-1">{{ venue.name }}</h3>
+          <p class="text-gray-500 dark:text-gray-400 mb-4 flex items-center gap-1 text-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            {{ venue.location }}
+          </p>
+
+          <!-- Stats Grid -->
+          <div class="grid grid-cols-2 gap-3 mb-6">
+            <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-xl">
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1 font-semibold flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+                {{ langService.translate('admin.halls') }}
+              </p>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-gray-900 dark:text-white">{{ venue.halls?.length || 0 }}</span>
+                @if (hasMissingMaps(venue)) {
+                <span
+                  class="text-[10px] bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 px-1.5 py-0.5 rounded border border-yellow-200 dark:border-yellow-800">
+                  ⚠️
+                </span>
+                }
+              </div>
+            </div>
+
+            <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-xl">
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1 font-semibold flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                {{ langService.translate('admin.capacity') }}
+              </p>
+              <div class="flex items-baseline gap-1">
+                <span class="font-bold text-gray-900 dark:text-white">{{ venue.capacity || 0 }}</span>
+                <span class="text-[10px] text-gray-500">({{ getTotalHallCapacity(venue) }})</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Buttons -->
+          <div class="mt-auto flex gap-2">
+            <button (click)="openViewModal(venue)"
+              class="flex-1 py-2.5 bg-primary-600 text-white rounded-xl font-bold hover:bg-primary-700 transition flex items-center justify-center gap-2 text-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+              </svg>
+              {{ langService.translate('admin.manage_halls') }}
+            </button>
+
+            <button (click)="openEditModal(venue)"
+              class="p-2.5 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded-xl hover:bg-blue-200 transition">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+            </button>
+
+            <button (click)="openDeleteModal(venue)"
+              class="p-2.5 bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 rounded-xl hover:bg-red-200 transition">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      } @empty {
+      <div
+        class="col-span-full text-center py-20 bg-white dark:bg-dark-card rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 text-gray-300 mx-auto mb-4" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{
+          langService.translate('admin.no_venues_found') }}</h3>
+        <p class="text-gray-500 dark:text-gray-400 mb-6">{{ langService.translate('admin.stadium_usage_desc') }}</p>
+        <button (click)="openAddModal()"
+          class="px-8 py-4 bg-gradient-to-r from-primary-600 to-secondary-600 text-white font-bold rounded-xl hover:shadow-xl transition flex items-center gap-2 mx-auto">
+          {{ langService.translate('admin.add_first_venue') }}
+        </button>
+      </div>
+      }
+    </div>
+    }
+  </div>
+</div>
+
+<!-- Add/Edit Modal -->
+@if (showModal) {
+<div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[50]" (click)="closeModal()"></div>
+<div class="fixed inset-0 flex items-center justify-center z-[55] p-4" (click)="closeModal()">
+  <div
+    class="bg-white dark:bg-dark-card rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-100 dark:border-gray-800"
+    (click)="$event.stopPropagation()">
+
+    <!-- Modal Header -->
+    <div class="bg-gradient-to-r from-primary-600 to-secondary-600 text-white p-6 rounded-t-3xl">
+      <div class="flex justify-between items-center">
+        <h2 class="text-2xl font-bold flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          {{ isEditMode ? langService.translate('admin.edit_venue') : langService.translate('admin.create_venue') }}
+        </h2>
+        <button (click)="closeModal()"
+          class="text-white hover:text-gray-200 text-3xl transition-transform hover:rotate-90">×</button>
+      </div>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="p-8 space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Venue Name -->
+        <div class="md:col-span-2">
+          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{
+            langService.translate('admin.venue_name') }} *</label>
+          <input type="text" [(ngModel)]="venueForm.name" placeholder="..."
+            class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition text-gray-900 dark:text-white" />
+        </div>
+
+        <!-- Location -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{
+            langService.translate('admin.venue_location') }} *</label>
+          <input type="text" [(ngModel)]="venueForm.location" placeholder="..."
+            class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition text-gray-900 dark:text-white" />
+        </div>
+
+        <!-- City -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{
+            langService.translate('admin.venue_city') }} *</label>
+          <input type="text" [(ngModel)]="venueForm.city" placeholder="..."
+            class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition text-gray-900 dark:text-white" />
+        </div>
+
+        <!-- Capacity -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{
+            langService.translate('admin.venue_capacity') }}</label>
+          <input type="number" [(ngModel)]="venueForm.capacity"
+            class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition text-gray-900 dark:text-white" />
+        </div>
+
+        <!-- Image URL -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{
+            langService.translate('admin.venue_image') }}</label>
+          <input type="text" [(ngModel)]="venueForm.image" placeholder="URL"
+            class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition text-gray-900 dark:text-white" />
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{
+          langService.translate('admin.venue_description') }}</label>
+        <textarea [(ngModel)]="venueForm.description" rows="3"
+          class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition text-gray-900 dark:text-white resize-none"></textarea>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="p-6 border-t dark:border-gray-800 flex gap-4 bg-gray-50 dark:bg-gray-900/40 rounded-b-3xl">
+      <button (click)="closeModal()"
+        class="flex-1 py-3 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-700 transition font-bold">
+        {{ langService.translate('admin.cancel') }}
+      </button>
+      <button (click)="saveVenue()" [disabled]="loading"
+        class="flex-1 py-3 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-xl font-bold hover:shadow-lg disabled:opacity-50 transition">
+        @if (loading) {
+        <span class="flex items-center justify-center gap-2 animate-pulse">
+          {{ langService.translate('admin.saving') }}
+        </span>
+        } @else {
+        {{ isEditMode ? langService.translate('admin.save') : langService.translate('admin.create') }}
+        }
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Delete Confirmation Modal -->
+@if (showDeleteModal && deletingVenue) {
+<div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60]" (click)="closeDeleteModal()"></div>
+<div class="fixed inset-0 flex items-center justify-center z-[65] p-4" (click)="closeDeleteModal()">
+  <div
+    class="bg-white dark:bg-dark-card rounded-3xl shadow-2xl max-w-sm w-full p-8 border border-gray-100 dark:border-gray-800"
+    (click)="$event.stopPropagation()">
+    <div class="text-center">
+      <div class="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-red-600" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+      </div>
+      <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ langService.translate('admin.delete') }}?
+      </h3>
+      <p class="text-primary-600 font-bold mb-1">{{ deletingVenue.name }}</p>
+      <p class="text-red-500 text-xs font-semibold mb-8">{{ langService.translate('admin.delete_venue_warning') }}</p>
+
+      <div class="flex gap-4">
+        <button (click)="closeDeleteModal()"
+          class="flex-1 py-3 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 transition font-bold">
+          {{ langService.translate('admin.cancel') }}
+        </button>
+        <button (click)="confirmDelete()"
+          class="flex-1 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition font-bold shadow-lg shadow-red-900/20">
+          {{ langService.translate('admin.delete') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+<!-- View Details Modal (Halls Management) -->
+@if (showViewModal && viewingVenue) {
+<div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[40]" (click)="closeViewModal()"></div>
+<div class="fixed inset-0 flex items-center justify-center z-[45] p-4" (click)="closeViewModal()">
+  <div
+    class="bg-white dark:bg-dark-card rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-100 dark:border-gray-800"
+    (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-6 rounded-t-3xl">
+      <div class="flex justify-between items-center">
+        <h2 class="text-2xl font-bold flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+          {{ viewingVenue.name }}
+        </h2>
+        <button (click)="closeViewModal()" class="text-white hover:text-gray-200 text-3xl">×</button>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="p-8 space-y-8">
+      <!-- Venue Info Summary -->
+      <div class="grid grid-cols-2 gap-4">
+        <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl">
+          <p class="text-xs text-gray-500 dark:text-gray-400 mb-1 font-semibold">{{
+            langService.translate('admin.venue_location') }}</p>
+          <p class="font-bold text-gray-900 dark:text-white">{{ viewingVenue.location }}</p>
+        </div>
+        <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl">
+          <p class="text-xs text-gray-500 dark:text-gray-400 mb-1 font-semibold">{{
+            langService.translate('admin.capacity') }}</p>
+          <p class="font-bold text-gray-900 dark:text-white">{{ viewingVenue.capacity || 'N/A' }}</p>
+        </div>
+      </div>
+
+      <!-- Halls List Section -->
+      <div>
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            {{ langService.translate('admin.halls') }} ({{ viewingVenue.halls?.length || 0 }})
+          </h3>
+          <button (click)="openAddHallModal()"
+            class="px-4 py-2 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-xl hover:bg-primary-200 transition font-bold text-sm flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            {{ langService.translate('admin.add_hall') }}
+          </button>
+        </div>
+
+        @if (viewingVenue.halls && viewingVenue.halls.length > 0) {
+        <div class="grid grid-cols-1 gap-4">
+          @for (hall of viewingVenue.halls; track hall._id) {
+          <div
+            class="p-5 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition">
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <h4 class="font-bold text-gray-900 dark:text-white text-lg">{{ hall.name }}</h4>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ langService.translate('admin.capacity') }}: <span
+                    class="font-bold text-primary-600">{{ hall.capacity }}</span></p>
+              </div>
+              <div class="flex gap-2">
+                <a [routerLink]="['/admin/halls', hall._id, 'seat-map']" (click)="closeViewModal()"
+                  class="px-3 py-1.5 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 rounded-lg hover:bg-indigo-200 transition text-xs font-bold flex items-center gap-1.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7" />
+                  </svg>
+                  {{ langService.translate('admin.seat_map') }}
+                </a>
+                <button (click)="openEditHallModal(hall)"
+                  class="p-2 bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300 rounded-lg hover:bg-yellow-200 transition">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                </button>
+                <button (click)="deleteHall(hall._id)"
+                  class="p-2 bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 rounded-lg hover:bg-red-200 transition">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            @if (hall.seat_categories && hall.seat_categories.length > 0) {
+            <div class="flex gap-2 flex-wrap pt-3 border-t dark:border-gray-700">
+              @for (cat of hall.seat_categories; track $index) {
+              <div
+                class="px-2 py-1 bg-gray-50 dark:bg-gray-900 rounded-md border border-gray-100 dark:border-gray-800 text-[10px] flex gap-2">
+                <span class="text-gray-500 font-semibold">{{ cat.name }}</span>
+                <span class="font-bold text-gray-900 dark:text-white">{{ cat.count }}</span>
+              </div>
+              }
+            </div>
+            }
+          </div>
+          }
+        </div>
+        } @else {
+        <div
+          class="text-center p-10 bg-gray-50 dark:bg-gray-800/50 rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-700">
+          <p class="text-gray-500 italic text-sm">{{ langService.translate('admin.no_sections_added') }}</p>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="p-6 border-t dark:border-gray-800 flex gap-4 bg-gray-50 dark:bg-gray-900/40 rounded-b-3xl">
+      <button (click)="closeViewModal()"
+        class="flex-1 py-3 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-700 transition font-bold">
+        {{ langService.translate('admin.close') }}
+      </button>
+      <button (click)="openEditModal(viewingVenue); closeViewModal()"
+        class="flex-1 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-bold hover:shadow-lg transition flex items-center justify-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+        </svg>
+        {{ langService.translate('admin.edit_venue') }}
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Hall Modal -->
+@if (showHallModal) {
+<div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[70]" (click)="closeHallModal()"></div>
+<div class="fixed inset-0 flex items-center justify-center z-[75] p-4" (click)="closeHallModal()">
+  <div
+    class="bg-white dark:bg-dark-card rounded-3xl shadow-2xl max-w-md w-full border border-gray-100 dark:border-gray-800"
+    (click)="$event.stopPropagation()">
+    <div class="p-8">
+      <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary-600" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        {{ isHallEditMode ? langService.translate('admin.edit_hall') : langService.translate('admin.add_hall') }}
+      </h3>
+
+      <div class="space-y-6">
+        <div>
+          <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">{{
+            langService.translate('admin.hall_name') }}</label>
+          <input type="text" [(ngModel)]="hallForm.name" placeholder="..."
+            class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition text-gray-900 dark:text-white" />
+        </div>
+        <div>
+          <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">{{
+            langService.translate('admin.hall_capacity') }}</label>
+          <input type="number" [(ngModel)]="hallForm.capacity"
+            class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition text-gray-900 dark:text-white" />
+        </div>
+
+        <!-- Seat Categories Section -->
+        <div>
+          <div class="flex justify-between items-center mb-3">
+            <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 italic">{{
+              langService.translate('admin.seat_breakdown_opt') }}</label>
+            <button (click)="addSeatCategory()"
+              class="text-xs text-primary-600 dark:text-primary-400 font-bold hover:underline flex items-center gap-1">
+              + {{ langService.translate('admin.create') }}
+            </button>
+          </div>
+
+          <div class="space-y-3 max-h-48 overflow-y-auto pr-1">
+            @for (cat of hallForm.seat_categories; track $index) {
+            <div
+              class="flex gap-2 items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 animate-slide-up">
+              <input type="text" [(ngModel)]="cat.name" placeholder="Name"
+                class="flex-1 bg-transparent border-none focus:ring-0 text-sm text-gray-900 dark:text-white font-semibold">
+              <input type="number" [(ngModel)]="cat.count" placeholder="0"
+                class="w-16 bg-transparent border-none focus:ring-0 text-sm font-bold text-primary-600 text-right">
+              <button (click)="removeSeatCategory($index)"
+                class="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 flex gap-3">
+        <button (click)="closeHallModal()"
+          class="flex-1 py-3 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-700 transition font-bold">
+          {{ langService.translate('admin.cancel') }}
+        </button>
+        <button (click)="saveHall()"
+          class="flex-1 py-3 bg-primary-600 text-white rounded-xl font-bold hover:bg-primary-700 transition shadow-lg shadow-primary-900/20">
+          {{ langService.translate('admin.save_hall') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+}

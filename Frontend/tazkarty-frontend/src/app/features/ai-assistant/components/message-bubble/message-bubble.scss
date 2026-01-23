@@ -1,0 +1,73 @@
+.bubble {
+  border-radius: 1rem;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+  position: relative;
+  display: inline-block;
+
+  .bubble-header {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-bottom: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+
+    .icon {
+      font-size: 1.1rem;
+    }
+
+    .name {
+      opacity: 0.9;
+    }
+  }
+
+  .content {
+    white-space: pre-wrap;
+    line-height: 1.6;
+    font-size: 0.9rem;
+  }
+
+  .timestamp {
+    margin-top: 0.35rem;
+    font-size: 0.7rem;
+    opacity: 0.7;
+  }
+}
+
+.user-bubble {
+  background: linear-gradient(135deg, #4f46e5, #ec4899);
+  color: #fff;
+  border-bottom-right-radius: 0.35rem;
+}
+
+.ai-bubble {
+  background: #ffffff;
+  color: #111827;
+  border-bottom-left-radius: 0.35rem;
+}
+
+.typing {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.dot {
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 999px;
+  background: #9ca3af;
+  animation: typing-bounce 1s infinite ease-in-out;
+}
+
+@keyframes typing-bounce {
+  0%, 80%, 100% {
+    transform: translateY(0);
+    opacity: 0.3;
+  }
+  40% {
+    transform: translateY(-3px);
+    opacity: 1;
+  }
+}

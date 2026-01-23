@@ -1,0 +1,488 @@
+<div class="flex h-[calc(100vh-64px)] bg-gray-100 overflow-hidden">
+    <!-- Sidebar / Toolbox -->
+    <div class="w-80 bg-white shadow-xl flex flex-col z-20 border-r border-gray-200">
+        <!-- Header -->
+        <div class="p-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+            <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                <span class="text-xl">🛠️</span> Editor
+            </h3>
+            <div class="flex gap-1" *ngIf="history.length > 1">
+                <button (click)="undo()" [disabled]="historyIndex <= 0"
+                    class="p-2 rounded hover:bg-gray-200 disabled:opacity-30 transition" title="Undo">
+                    ↩️
+                </button>
+                <button (click)="redo()" [disabled]="historyIndex >= history.length - 1"
+                    class="p-2 rounded hover:bg-gray-200 disabled:opacity-30 transition" title="Redo">
+                    ↪️
+                </button>
+            </div>
+        </div>
+
+        <!-- Tools Grid -->
+        <div class="p-4 grid grid-cols-2 gap-3">
+            <button (click)="selectedTool = 'select'"
+                class="flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all hover:shadow-md"
+                [class.border-primary-500]="selectedTool === 'select'" [class.bg-primary-50]="selectedTool === 'select'"
+                [class.text-primary-700]="selectedTool === 'select'" [class.border-gray-200]="selectedTool !== 'select'"
+                [class.text-gray-600]="selectedTool !== 'select'">
+                <span class="text-2xl mb-1">👆</span>
+                <span class="text-xs font-bold">Select</span>
+            </button>
+
+            <button (click)="addSection()"
+                class="flex flex-col items-center justify-center p-3 rounded-lg border-2 border-gray-200 text-gray-600 transition-all hover:bg-gray-50 hover:border-gray-300 hover:shadow-md">
+                <span class="text-2xl mb-1">🟩</span>
+                <span class="text-xs font-bold">Add Section</span>
+            </button>
+
+            <button (click)="addZone()"
+                class="flex flex-col items-center justify-center p-3 rounded-lg border-2 border-gray-200 text-gray-600 transition-all hover:bg-gray-50 hover:border-gray-300 hover:shadow-md">
+                <span class="text-2xl mb-1">🟦</span>
+                <span class="text-xs font-bold">Add Area</span>
+            </button>
+
+            <button (click)="addRow()"
+                class="flex flex-col items-center justify-center p-3 rounded-lg border-2 border-gray-200 text-gray-600 transition-all hover:bg-gray-50 hover:border-gray-300 hover:shadow-md">
+                <span class="text-2xl mb-1">🪜</span>
+                <span class="text-xs font-bold">Add Row</span>
+            </button>
+
+            <div class="flex flex-col justify-center p-2 rounded-lg border border-gray-200 bg-gray-50">
+                <label class="text-[10px] uppercase font-bold text-gray-400 mb-1 text-center">Row Seats</label>
+                <input type="number" [(ngModel)]="newRowSeatCount" min="1" max="100"
+                    class="w-full text-center font-bold text-gray-700 border border-gray-300 rounded py-1">
+            </div>
+
+            <button (click)="config.stage ? null : addStage()" [disabled]="!!config.stage"
+                class="flex flex-col items-center justify-center p-3 rounded-lg border-2 border-gray-200 text-gray-600 transition-all hover:bg-gray-50 hover:border-gray-300 hover:shadow-md disabled:opacity-50">
+                <span class="text-2xl mb-1">🎭</span>
+                <span class="text-xs font-bold">Add Stage</span>
+            </button>
+        </div>
+
+        <hr class="border-gray-100 mx-4">
+
+        <!-- Selected Item Properties -->
+        <div class="flex-1 overflow-y-auto p-4">
+            @if (selectedZone) {
+            <div class="border-b border-gray-200 pb-4">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="font-medium text-gray-900">Zone Properties</h3>
+                    <button (click)="deleteZone()"
+                        class="text-xs text-white bg-red-500 hover:bg-red-600 px-2 py-1 rounded">
+                        Delete
+                    </button>
+                </div>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Label</label>
+                        <input [(ngModel)]="selectedZone.label" (ngModelChange)="saveState()"
+                            class="w-full text-sm border border-gray-300 rounded px-2 py-1">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Color</label>
+                        <div class="flex items-center space-x-2">
+                            <input type="color" [(ngModel)]="selectedZone.color"
+                                (ngModelChange)="refreshMap(); saveState()"
+                                class="h-8 w-8 p-0 border border-gray-300 rounded cursor-pointer">
+                            <span class="text-xs text-gray-400">{{selectedZone.color}}</span>
+                            <span class="text-xs text-gray-400">{{selectedZone.color}}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Angle</label>
+                        <input type="number" [(ngModel)]="selectedZone.rotation"
+                            (ngModelChange)="refreshMap(); saveState()"
+                            class="w-full text-sm border border-gray-300 rounded px-2 py-1">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Pos X</label>
+                            <input type="number" [(ngModel)]="selectedZone.position.x"
+                                (ngModelChange)="refreshMap(); saveState()"
+                                class="w-full text-sm border border-gray-300 rounded px-2 py-1">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Pos Y</label>
+                            <input type="number" [(ngModel)]="selectedZone.position.y"
+                                (ngModelChange)="refreshMap(); saveState()"
+                                class="w-full text-sm border border-gray-300 rounded px-2 py-1">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Width</label>
+                            <input type="number" [(ngModel)]="selectedZone.dimensions.width"
+                                (ngModelChange)="refreshMap(); saveState()"
+                                class="w-full text-sm border border-gray-300 rounded px-2 py-1">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Height</label>
+                            <input type="number" [(ngModel)]="selectedZone.dimensions.height"
+                                (ngModelChange)="refreshMap(); saveState()"
+                                class="w-full text-sm border border-gray-300 rounded px-2 py-1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            }
+
+            @if (selectedSections.length > 1) {
+            <div class="bg-indigo-50 border border-indigo-100 rounded-lg p-4 mb-4">
+                <h4 class="text-xs font-bold uppercase text-indigo-800 tracking-wider mb-3">Group Alignment</h4>
+                <div class="grid grid-cols-3 gap-2">
+                    <button (click)="align('left')"
+                        class="p-2 bg-white border border-indigo-200 rounded hover:bg-indigo-100 text-xs"
+                        title="Align Left">⬅️ Left</button>
+                    <button (click)="align('center-x')"
+                        class="p-2 bg-white border border-indigo-200 rounded hover:bg-indigo-100 text-xs"
+                        title="Align Center X">↔️ Center</button>
+                    <button (click)="align('right')"
+                        class="p-2 bg-white border border-indigo-200 rounded hover:bg-indigo-100 text-xs"
+                        title="Align Right">➡️ Right</button>
+
+                    <button (click)="align('top')"
+                        class="p-2 bg-white border border-indigo-200 rounded hover:bg-indigo-100 text-xs"
+                        title="Align Top">⬆️ Top</button>
+                    <button (click)="align('center-y')"
+                        class="p-2 bg-white border border-indigo-200 rounded hover:bg-indigo-100 text-xs"
+                        title="Align Center Y">↕️ Middle</button>
+                    <button (click)="align('bottom')"
+                        class="p-2 bg-white border border-indigo-200 rounded hover:bg-indigo-100 text-xs"
+                        title="Align Bottom">⬇️ Bottom</button>
+
+                    <button (click)="align('distribute-x')"
+                        class="col-span-1 p-2 bg-white border border-indigo-200 rounded hover:bg-indigo-100 text-xs"
+                        title="Distribute Horizontally">ClassName X</button>
+                    <button (click)="align('distribute-y')"
+                        class="col-span-2 p-2 bg-white border border-indigo-200 rounded hover:bg-indigo-100 text-xs"
+                        title="Distribute Vertically">Distribute Y</button>
+                </div>
+                <div class="mt-2 text-xs text-gray-500 text-center">{{ selectedSections.length }} sections selected
+                </div>
+            </div>
+            }
+
+            @if (selectedSection) {
+            <div class="border-b border-gray-200 pb-4">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="font-medium text-gray-900">Section Properties</h3>
+                    <button (click)="deleteSection()"
+                        class="text-xs text-white bg-red-500 hover:bg-red-600 px-2 py-1 rounded">
+                        Delete
+                    </button>
+                </div>
+
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="col-span-2">
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Rows Arrangement</label>
+                        <select [ngModel]="selectedSection.rows[0]?.rowType || 'curved'"
+                            (ngModelChange)="updateSectionLayout($event)"
+                            class="w-full text-sm border border-gray-300 rounded px-2 py-1">
+                            <option value="curved">Curved (Arc)</option>
+                            <option value="linear">Straight Line</option>
+                        </select>
+                        <p class="text-[10px] text-gray-400 mt-1">Applies to all rows in section</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Label</label>
+                        <input [(ngModel)]="selectedSection.label" (ngModelChange)="saveState()"
+                            class="w-full text-sm border border-gray-300 rounded px-2 py-1">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Angle</label>
+                        <input type="number" [(ngModel)]="selectedSection.rotation"
+                            (ngModelChange)="refreshMap(); saveState()"
+                            class="w-full text-sm border border-gray-300 rounded px-2 py-1">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Pos X</label>
+                        <input type="number" [(ngModel)]="selectedSection.position.x"
+                            (ngModelChange)="refreshMap(); saveState()"
+                            class="w-full text-sm border border-gray-300 rounded px-2 py-1">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Pos Y</label>
+                        <input type="number" [(ngModel)]="selectedSection.position.y"
+                            (ngModelChange)="refreshMap(); saveState()"
+                            class="w-full text-sm border border-gray-300 rounded px-2 py-1">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Width</label>
+                        <input type="number" [(ngModel)]="selectedSection.dimensions.width"
+                            (ngModelChange)="refreshMap(); saveState()"
+                            class="w-full text-sm border border-gray-300 rounded px-2 py-1">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Height</label>
+                        <input type="number" [(ngModel)]="selectedSection.dimensions.height"
+                            (ngModelChange)="refreshMap(); saveState()"
+                            class="w-full text-sm border border-gray-300 rounded px-2 py-1">
+                    </div>
+                </div>
+            </div>
+            } @else if (selectedRow) {
+            <div class="border-b border-gray-200 pb-4">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="font-medium text-gray-900">Row Properties</h3>
+                    <button (click)="deleteRow()"
+                        class="text-xs text-white bg-red-500 hover:bg-red-600 px-2 py-1 rounded">
+                        Delete
+                    </button>
+                </div>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Row Label</label>
+                        <input [(ngModel)]="selectedRow.label" (ngModelChange)="saveState()"
+                            class="w-full text-sm border border-gray-300 rounded px-2 py-1">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Category (Tier)</label>
+                        <select [ngModel]="selectedRow.seats[0]?.type" (ngModelChange)="updateRowCategory($event)"
+                            class="w-full text-sm border border-gray-300 rounded px-2 py-1">
+                            @for (tier of pricingTiers; track tier.name) {
+                            <option [value]="tier.name.toLowerCase()">{{ tier.name }}</option>
+                            }
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Layout Type</label>
+                        <select [(ngModel)]="selectedRow.rowType"
+                            (ngModelChange)="updateRowSeats(selectedRow); saveState()"
+                            class="w-full text-sm border border-gray-300 rounded px-2 py-1">
+                            <option value="curved">Curved (Arc)</option>
+                            <option value="linear">Straight Line</option>
+                        </select>
+                    </div>
+
+                    @if (selectedRow.rowType === 'linear') {
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Spacing (px)</label>
+                        <input type="number" [(ngModel)]="selectedRow.spacing"
+                            (ngModelChange)="updateRowSeats(selectedRow); saveState()"
+                            class="w-full text-sm border border-gray-300 rounded px-2 py-1" placeholder="35">
+                    </div>
+                    } @else {
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Radius</label>
+                            <input type="number" [(ngModel)]="selectedRow.radius"
+                                (ngModelChange)="updateRowSeats(selectedRow); saveState()"
+                                class="w-full text-sm border border-gray-300 rounded px-2 py-1">
+                        </div>
+                        <!-- Curvature Controls -->
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Start Angle</label>
+                            <input type="number" [(ngModel)]="selectedRow.startAngle"
+                                (ngModelChange)="updateRowSeats(selectedRow); saveState()"
+                                class="w-full text-sm border border-gray-300 rounded px-2 py-1">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">End Angle</label>
+                            <input type="number" [(ngModel)]="selectedRow.endAngle"
+                                (ngModelChange)="updateRowSeats(selectedRow); saveState()"
+                                class="w-full text-sm border border-gray-300 rounded px-2 py-1">
+                        </div>
+                    </div>
+                    }
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Seats</label>
+                            <input type="number" [(ngModel)]="selectedRow.seatCount"
+                                (ngModelChange)="updateRowSeats(selectedRow); saveState()"
+                                class="w-full text-sm border border-gray-300 rounded px-2 py-1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            } @else if (selectedSeat) {
+            <div class="border-b border-gray-200 pb-4">
+                <h3 class="font-medium text-gray-900 mb-2">Seat Properties</h3>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Label</label>
+                        <input [(ngModel)]="selectedSeat.label" (ngModelChange)="saveState()"
+                            class="w-full text-sm border border-gray-300 rounded px-2 py-1">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Category</label>
+                        <select [(ngModel)]="selectedSeat.type" (ngModelChange)="refreshMap(); saveState()"
+                            class="w-full text-sm border border-gray-300 rounded px-2 py-1">
+                            @for (tier of pricingTiers; track tier.name) {
+                            <option [value]="tier.name.toLowerCase()">{{ tier.name }}</option>
+                            }
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Status</label>
+                        <select [(ngModel)]="selectedSeat.status" (ngModelChange)="refreshMap(); saveState()"
+                            class="w-full text-sm border border-gray-300 rounded px-2 py-1">
+                            <option value="available">Available</option>
+                            <option value="disabled">Disabled</option>
+                            <option value="gap">Gap (Hidden)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            } @else {
+            <!-- Global / Tier Settings when nothing selected -->
+            <!-- Global / Tier Settings when nothing selected -->
+
+            @if (config.stage) {
+            <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100 mb-4">
+                <h3 class="font-bold text-indigo-800 mb-3 flex items-center justify-between">
+                    <span>🎭 Stage Config</span>
+                    <button (click)="removeStage()" class="text-red-500 text-xs hover:underline">Remove</button>
+                </h3>
+                <div class="space-y-2">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Label</label>
+                        <input [(ngModel)]="config.stage.label" (ngModelChange)="saveState()"
+                            class="w-full text-sm border border-gray-300 rounded px-2 py-1">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Pos X</label>
+                            <input type="number" [(ngModel)]="config.stage.position.x"
+                                (ngModelChange)="refreshMap(); saveState()"
+                                class="w-full text-sm border border-gray-300 rounded px-2 py-1">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Pos Y</label>
+                            <input type="number" [(ngModel)]="config.stage.position.y"
+                                (ngModelChange)="refreshMap(); saveState()"
+                                class="w-full text-sm border border-gray-300 rounded px-2 py-1">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Width</label>
+                            <input type="number" [(ngModel)]="config.stage.dimensions.width"
+                                (ngModelChange)="refreshMap(); saveState()"
+                                class="w-full text-sm border border-gray-300 rounded px-2 py-1">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Height</label>
+                            <input type="number" [(ngModel)]="config.stage.dimensions.height"
+                                (ngModelChange)="refreshMap(); saveState()"
+                                class="w-full text-sm border border-gray-300 rounded px-2 py-1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            }
+
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                    <span>🏷️</span> Pricing Tiers
+                </h3>
+                <div class="space-y-2 mb-3 max-h-40 overflow-y-auto">
+                    @for (tier of pricingTiers; track tier.name; let i = $index) {
+                    <div class="flex items-center gap-2 bg-white p-2 rounded border border-gray-200">
+                        <input type="color" [(ngModel)]="tier.color" (change)="refreshMap(); updateTierMap()"
+                            class="w-6 h-6 p-0 border-0 rounded overflow-hidden cursor-pointer">
+                        <input [(ngModel)]="tier.name" class="flex-1 text-xs border-none focus:ring-0 p-0"
+                            placeholder="Tier Name">
+                        <button (click)="removeTier(i)" class="text-red-400 hover:text-red-600 px-1"
+                            title="Remove">×</button>
+                    </div>
+                    }
+                </div>
+                <button (click)="addTier('New Tier', '#000000')"
+                    class="w-full py-1.5 text-xs bg-white border border-dashed border-gray-400 text-gray-600 rounded hover:bg-gray-50">
+                    + Add Pricing Tier
+                </button>
+            </div>
+            }
+
+            <!-- Errors List -->
+            @if (validationIssues.length > 0) {
+            <div class="mt-6 bg-red-50 border border-red-100 rounded-lg p-4">
+                <h4 class="text-xs font-bold uppercase text-red-800 tracking-wider mb-3 flex items-center gap-2">
+                    <span>⚠️</span> Issues ({{validationIssues.length}})
+                </h4>
+                <ul class="space-y-2">
+                    @for (issue of validationIssues; track issue) {
+                    <li class="text-xs text-red-700 bg-red-100/50 p-2 rounded flex gap-2 items-start">
+                        <span class="font-bold">•</span>
+                        {{ issue.message }}
+                    </li>
+                    }
+                </ul>
+            </div>
+            }
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="p-4 border-t border-gray-200 bg-gray-50 space-y-3">
+            @if (error) {
+            <div class="p-3 bg-red-100 border border-red-200 text-red-700 text-xs rounded mb-2">
+                {{ error }}
+            </div>
+            }
+            @if (successMessage) {
+            <div class="p-3 bg-green-100 border border-green-200 text-green-700 text-xs rounded mb-2">
+                {{ successMessage }}
+            </div>
+            }
+
+            <button (click)="saveConfig()" [disabled]="isSaving || isLoading"
+                class="w-full py-3 bg-gradient-to-r from-primary-600 to-secondary-600 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                @if (isSaving) {
+                <span class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+                Saving...
+                } @else {
+                <span>💾 Save Configuration</span>
+                }
+            </button>
+        </div>
+    </div>
+
+    <!-- Canvas Area -->
+    <div
+        class="flex-1 relative bg-gray-200/50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] overflow-hidden">
+
+        <!-- Toolbar Overlay -->
+        <div class="absolute top-4 left-4 z-10 flex gap-2 flex-col">
+            <div
+                class="bg-white/90 backdrop-blur shadow-sm border border-gray-200 rounded-full px-4 py-2 text-xs font-mono text-gray-500">
+                Grid: {{ GRID_SIZE }}px
+            </div>
+
+            <div class="bg-white/90 backdrop-blur shadow-sm border border-gray-200 rounded-lg p-1 flex gap-1">
+                <button (click)="toggleDrawMode()" [class.bg-blue-100]="isDrawMode"
+                    class="p-2 hover:bg-gray-100 rounded text-gray-700"
+                    title="Draw Section (Drag to Create)">✏️</button>
+
+                <div class="w-px bg-gray-300 mx-1"></div>
+
+                <button (click)="selectedTool = selectedTool === 'eraser' ? 'select' : 'eraser'"
+                    [class.bg-red-100]="selectedTool === 'eraser'" class="p-2 hover:bg-gray-100 rounded text-gray-700"
+                    title="Eraser Tool (Click seat to remove/gap)">🧹</button>
+
+                <button (click)="selectedTool = selectedTool === 'lock' ? 'select' : 'lock'"
+                    [class.bg-orange-100]="selectedTool === 'lock'" class="p-2 hover:bg-gray-100 rounded text-gray-700"
+                    title="Lock Tool (Click seat to disable)">🔒</button>
+
+                <div class="w-px bg-gray-300 mx-1"></div>
+
+                <button (click)="zoomIn()" class="p-2 hover:bg-gray-100 rounded text-gray-700"
+                    title="Zoom In">➕</button>
+                <button (click)="zoomOut()" class="p-2 hover:bg-gray-100 rounded text-gray-700"
+                    title="Zoom Out">➖</button>
+                <button (click)="resetView()" class="p-2 hover:bg-gray-100 rounded text-gray-700"
+                    title="Reset / Fit Content">FIT</button>
+            </div>
+        </div>
+
+        <!-- The actual Seat Map Component -->
+        <div class="w-full h-full p-8 flex items-center justify-center">
+            <div class="w-full h-full bg-white shadow-2xl rounded-xl overflow-hidden border border-gray-200 relative">
+                <app-seat-map [config]="config" [viewOnly]="false" [interactionMode]="interactionMode"
+                    [tierColors]="tierColorMap" (seatClick)="onSeatClick($event)"
+                    (sectionCreate)="onSectionCreate($event)" [fitOnLoad]="false"></app-seat-map>
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,436 @@
+<div class="min-h-screen bg-gray-50 dark:bg-dark-bg py-8 transition-colors duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <!-- 1. Header with Stepper and Back Button -->
+        <div class="mb-8">
+            <app-booking-stepper [currentStep]="1"></app-booking-stepper>
+
+            <button (click)="goBack()"
+                class="group flex items-center text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 transition-colors mb-4">
+                <div
+                    class="w-8 h-8 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center group-hover:border-primary-300 dark:group-hover:border-primary-500 group-hover:shadow-md transition-all mr-2">
+                    <svg class="w-4 h-4 transform group-hover:-translate-x-0.5 transition-transform" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
+                        </path>
+                    </svg>
+                </div>
+                <span class="font-bold text-sm">{{ langService.translate('booking.back_to_event') }}</span>
+            </button>
+        </div>
+
+        <!-- Event Context Header -->
+        @if (showDetails()) {
+        <div
+            class="mb-8 p-6 bg-white dark:bg-dark-card rounded-xl shadow-sm border-l-4 border-primary-600 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                    {{ showDetails().title || showDetails().event?.title || 'Event' }}
+                </h1>
+                <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                    <span class="flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" aria-hidden="true" fill="currentColor"
+                            viewBox="0 0 24 24">
+                            <path fill-rule="evenodd"
+                                d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        {{ langService.translate(showDetails().venue?.name || 'common.venue') }}
+                    </span>
+                    <span class="flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" aria-hidden="true" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        {{ showDetails().start_time | date:'medium' }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="text-right hidden md:block">
+                @if (isSportsMode() && gatesOpenTime()) {
+                <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">{{
+                    langService.translate('booking.gates_open') }}</div>
+                <div class="text-lg font-bold text-gray-700 dark:text-gray-300 mb-2">{{ gatesOpenTime() |
+                    date:'shortTime' }}</div>
+                }
+                {{ isSportsMode() ? langService.translate('booking.match_start') :
+                langService.translate('booking.showtime') }}
+            </div>
+            <div class="text-xl font-bold text-gray-900 dark:text-white">{{ showDetails().start_time |
+                date:'shortTime' }}</div>
+        </div>
+        }
+
+        <!-- Header / Countdown -->
+        <div class="flex justify-between items-end mb-8">
+            <div>
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+                    {{ isSportsMode() ? langService.translate('booking.confirm_booking') :
+                    langService.translate('booking.select_seats') }}
+                </h2>
+                @if (!isSportsMode()) {
+                <p class="text-gray-500 dark:text-gray-400 text-sm">{{
+                    langService.translate('booking.select_seats_desc') }}
+                </p>
+                }
+            </div>
+            @if (lockExpiresIn() > 0) {
+            <div
+                class="flex items-center gap-2 text-red-600 font-bold bg-red-50 dark:bg-red-900/20 px-4 py-2 rounded-full border border-red-100 dark:border-red-900/30">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 animate-pulse" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{{ lockExpiresIn() | number:'1.0-0' }}s</span>
+            </div>
+            }
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+            <!-- 2. Seat Map / Ticket Preview Section -->
+            <div class="lg:col-span-8 space-y-6">
+                <div
+                    class="bg-white dark:bg-dark-card rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-1 min-h-[600px] h-[700px] relative overflow-hidden flex flex-col items-center justify-center">
+
+                    <!-- Loading State -->
+                    @if (loading()) {
+                    <div
+                        class="absolute inset-0 z-10 bg-white/80 dark:bg-black/50 backdrop-blur-sm flex items-center justify-center">
+                        <div class="flex flex-col items-center">
+                            <div class="spinner"></div>
+                            <p class="mt-4 text-gray-600 dark:text-gray-300 font-medium">{{
+                                langService.translate('booking.loading') }}</p>
+                        </div>
+                    </div>
+                    }
+
+                    @if (isSportsMode()) {
+                    <!-- SPORTS MODE: TICKET PREVIEW -->
+                    <div class="w-full max-w-2xl transform hover:scale-[1.01] transition-transform duration-300">
+                        <!-- Ticket Container -->
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row border border-gray-200 dark:border-gray-700">
+
+                            <!-- Left Part (Main Info) -->
+                            <div
+                                class="md:w-2/3 p-8 bg-gradient-to-br from-gray-900 to-black text-white relative overflow-hidden">
+                                <!-- Background Pattern -->
+                                <div
+                                    class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl">
+                                </div>
+
+                                <div class="relative z-10">
+                                    <div
+                                        class="flex items-center gap-2 text-primary-400 font-bold tracking-wider text-xs mb-6 uppercase">
+                                        <span class="bg-primary-500/20 px-2 py-1 rounded">{{
+                                            langService.translate('booking.sports_event') }}</span>
+                                    </div>
+
+                                    <h2 class="text-3xl font-black mb-2 leading-tight">
+                                        {{ langService.translate(showDetails()?.title || showDetails()?.event?.title ||
+                                        'booking.match_day') }}
+                                    </h2>
+                                    <p class="text-gray-400 text-sm mb-6 flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                            </path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                        {{ langService.translate(showDetails()?.venue?.name || 'common.stadium') }}
+                                    </p>
+
+                                    <!-- User Info (New) -->
+                                    <div
+                                        class="mb-8 p-3 bg-white/10 rounded-lg border border-white/10 flex items-center gap-3">
+                                        <div
+                                            class="w-10 h-10 rounded-full bg-primary-500 text-white flex items-center justify-center font-bold text-lg">
+                                            {{ currentUser()?.name?.charAt(0) || 'G' }}
+                                        </div>
+                                        <div>
+                                            <div class="text-[10px] text-gray-400 uppercase tracking-widest">{{
+                                                langService.translate('booking.attendee') }}
+                                            </div>
+                                            <div class="text-sm font-bold text-white leading-tight">{{
+                                                currentUser()?.name || langService.translate('booking.guest_user') }}
+                                            </div>
+                                            <div class="text-[10px] text-gray-500 font-mono">{{
+                                                langService.translate('common.id') }}: {{ currentUser()?._id
+                                                ||
+                                                langService.translate('common.na') }}</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-2 gap-8">
+                                        <div>
+                                            <div class="text-xs text-gray-400 uppercase tracking-widest mb-1">{{
+                                                langService.translate('booking.match_start') }}</div>
+                                            <div class="text-xl font-bold text-white">{{ showDetails()?.start_time |
+                                                date:'shortTime' }}</div>
+                                            <div class="text-xs text-gray-500">{{ showDetails()?.start_time |
+                                                date:'mediumDate' }}</div>
+                                        </div>
+                                        @if (gatesOpenTime()) {
+                                        <div>
+                                            <div class="text-xs text-gray-400 uppercase tracking-widest mb-1">{{
+                                                langService.translate('booking.gates_open') }}
+                                            </div>
+                                            <div class="text-xl font-bold text-primary-400">{{ gatesOpenTime() |
+                                                date:'shortTime' }}</div>
+                                        </div>
+                                        }
+                                    </div>
+                                </div>
+
+                                <!-- Perforation Holes (Mobile Bottom / Desktop Right) -->
+                                <div
+                                    class="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-gray-50 dark:bg-dark-card rounded-full hidden md:block">
+                                </div>
+                            </div>
+
+                            <!-- Right Part (Section & QR) -->
+                            <div
+                                class="md:w-1/3 bg-gray-50 dark:bg-gray-700/50 p-8 flex flex-col items-center justify-between relative border-l-2 border-dashed border-gray-200 dark:border-gray-600">
+                                <div
+                                    class="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-gray-900 rounded-full hidden md:block">
+                                </div>
+
+                                <div class="text-center w-full">
+                                    <div class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">{{
+                                        langService.translate('booking.section') }}
+                                    </div>
+                                    <div
+                                        class="text-2xl font-black text-gray-900 dark:text-white break-words leading-none">
+                                        {{ langService.translate(sectionDetails()?.name || 'common.general') }}
+                                    </div>
+
+                                    <div
+                                        class="mt-4 inline-block px-3 py-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 rounded-full text-xs font-bold">
+                                        {{ sectionDetails()?.count }} {{ langService.translate('booking.tickets_count')
+                                        }}
+                                    </div>
+                                </div>
+
+                                <div class="my-6">
+                                    <!-- CSS QR Code Placeholder -->
+                                    <div
+                                        class="w-24 h-24 bg-white p-1 rounded-lg border-2 border-gray-900 flex flex-wrap content-center justify-center gap-1 overflow-hidden">
+                                        <div class="w-full h-full bg-gray-900"
+                                            style="mask-image: url('data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 10 10\'><rect x=\'1\' y=\'1\' width=\'3\' height=\'3\' fill=\'black\'/><rect x=\'6\' y=\'1\' width=\'3\' height=\'3\' fill=\'black\'/><rect x=\'1\' y=\'6\' width=\'3\' height=\'3\' fill=\'black\'/><rect x=\'5\' y=\'5\' width=\'1\' height=\'1\' fill=\'black\'/></svg>'); -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 10 10\'><rect x=\'1\' y=\'1\' width=\'3\' height=\'3\' fill=\'black\'/><rect x=\'6\' y=\'1\' width=\'3\' height=\'3\' fill=\'black\'/><rect x=\'1\' y=\'6\' width=\'3\' height=\'3\' fill=\'black\'/><rect x=\'5\' y=\'5\' width=\'1\' height=\'1\' fill=\'black\'/></svg>'); mask-size: cover; -webkit-mask-size: cover;">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{ langService.translate('booking.scan_gate') }}<br>{{
+                                langService.translate('booking.ref_id') }}: #PREVIEW
+                            </div>
+                        </div>
+                    </div>
+
+                    <p
+                        class="mt-8 text-gray-500 dark:text-gray-400 text-center max-w-lg text-sm bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800">
+                        <span
+                            class="block font-bold text-blue-800 dark:text-blue-300 mb-1 flex items-center justify-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            {{ langService.translate('booking.need_to_know') }}
+                        </span>
+                        <span [innerHTML]="sportsSeatGuide()"></span>
+                    </p>
+
+                    } @else {
+
+                    <!-- STANDARD MODE: Interactive Map -->
+                    @if (!loading() && isSoldOut()) {
+                    <div
+                        class="absolute inset-0 z-10 bg-white/95 dark:bg-black/90 flex items-center justify-center text-center p-8">
+                        <div class="max-w-md">
+                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{
+                                langService.translate('booking.sold_out') }}</h3>
+                            <a routerLink="/events" class="text-primary-600 font-bold hover:underline">{{
+                                langService.translate('booking.browse_other') }}</a>
+                        </div>
+                    </div>
+                    }
+
+
+                    <div class="flex-1 w-full flex items-center justify-center">
+                        @if (config()) {
+                        <div
+                            class="w-full h-full min-h-[600px] border border-gray-100 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 relative overflow-hidden">
+                            <app-seat-map [config]="config()" [seatStatus]="seatStatus()"
+                                (seatClick)="onSeatClick($event)" [autoResize]="true">
+                            </app-seat-map>
+                        </div>
+                        } @else if (!loading()) {
+                        <div class="text-center py-20 text-gray-400">
+                            <p>{{ langService.translate('booking.no_map') }}</p>
+                        </div>
+                        }
+                    </div>
+
+                    <!-- Legend -->
+                    <div
+                        class="border-t border-gray-100 dark:border-gray-700 pt-6 mt-4 flex flex-wrap justify-center gap-8 w-full">
+                        <div class="flex items-center gap-3">
+                            <div class="w-6 h-6 rounded-md border-2 border-green-500 bg-green-50 dark:bg-green-900/30">
+                            </div>
+                            <span class="text-sm text-gray-600 dark:text-gray-400 font-medium">{{
+                                langService.translate('booking.available') }}</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-6 h-6 rounded-md bg-yellow-500 shadow-sm border border-yellow-600"></div>
+                            <span class="text-sm text-gray-600 dark:text-gray-400 font-medium">{{
+                                langService.translate('booking.selected') }}</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-6 h-6 rounded-md bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800 opacity-50 flex items-center justify-center text-xs">
+                                ×</div>
+                            <span class="text-sm text-gray-600 dark:text-gray-400 font-medium">{{
+                                langService.translate('booking.occupied') }}</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-6 h-6 rounded-md bg-purple-500 border border-purple-600"></div>
+                            <span class="text-sm text-gray-600 dark:text-gray-400 font-medium">{{
+                                langService.translate('booking.vip') }}</span>
+                        </div>
+                    </div>
+                    }
+
+                </div>
+            </div>
+
+            <!-- 3. Sidebar (SUMMARY) -->
+            <div class="lg:col-span-4">
+                <div class="sticky top-6 space-y-6">
+
+                    <!-- Summary Card -->
+                    <div
+                        class="bg-white dark:bg-dark-card rounded-xl shadow-lg border border-gray-100 dark:border-gray-800 p-6">
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+                            <span
+                                class="bg-primary-100 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 p-2 rounded-lg mr-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                                </svg>
+                            </span>
+                            {{ langService.translate('booking.summary') }}
+                        </h3>
+
+                        @if (isSportsMode() && sectionDetails()) {
+                        <!-- SPORTS SUMMARY -->
+                        <div
+                            class="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm text-gray-500 dark:text-gray-400 font-medium">{{
+                                    langService.translate('booking.section') }}</span>
+                                <span class="text-gray-900 dark:text-white font-bold">{{
+                                    langService.translate(sectionDetails()?.name || 'common.general')
+                                    }}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500 dark:text-gray-400 font-medium">{{
+                                    langService.translate('nav.tickets') }}</span>
+                                <span class="text-gray-900 dark:text-white font-bold">x {{ sectionDetails()?.count
+                                    }}</span>
+                            </div>
+                        </div>
+                        } @else {
+                        @if (selectedSeats().length > 0) {
+                        <div class="mb-6">
+                            <div class="flex justify-between items-end mb-2">
+                                <span class="text-sm text-gray-500 dark:text-gray-400">{{
+                                    langService.translate('booking.selected_seats') }}</span>
+                                <span
+                                    class="text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded-full">{{
+                                    selectedSeats().length }} {{ langService.translate('booking.max') }}</span>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                @for (seatId of selectedSeats(); track seatId) {
+                                <div
+                                    class="animate-fadeInScale flex items-center bg-primary-50 dark:bg-primary-900/20 border border-primary-100 dark:border-primary-800 text-primary-700 dark:text-primary-300 px-3 py-1.5 rounded-lg shadow-sm">
+                                    <span class="font-bold mr-2 text-sm">{{ getSeatLabel(seatId) }}</span>
+                                    <button (click)="removeSeat(seatId)"
+                                        class="text-primary-400 hover:text-red-500 transition-colors">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                }
+                            </div>
+                        </div>
+                        } @else {
+                        <div
+                            class="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-6 text-center border-2 border-dashed border-gray-200 dark:border-gray-700 mb-6 transition-colors hover:border-primary-300">
+                            <div class="text-3xl mb-2 text-gray-300">💺</div>
+                            <p class="text-gray-400 text-sm">{{ langService.translate('booking.no_seats_selected') }}
+                            </p>
+                            <p class="text-gray-400 text-xs mt-1">{{ langService.translate('booking.click_map_start') }}
+                            </p>
+                        </div>
+                        }
+                        }
+
+                        <!-- Pricing Breakdown -->
+                        <div class="space-y-3 mb-6 border-t border-gray-100 dark:border-gray-800 pt-6">
+                            <div class="flex justify-between text-gray-600 dark:text-gray-400 text-sm">
+                                <span>{{ langService.translate('booking.ticket_price') }}</span>
+                                <span>{{ (isSportsMode() ? sectionDetails()?.price : pricePerSeat) | currency }} × {{
+                                    isSportsMode() ? sectionDetails()?.count : selectedSeats().length }}</span>
+                            </div>
+                            <div class="flex justify-between text-gray-600 dark:text-gray-400 text-sm">
+                                <span>{{ langService.translate('booking.booking_fee') }}</span>
+                                <span>{{ (selectedSeats().length * 2) | currency }}</span>
+                            </div>
+                            <div class="h-px bg-gray-100 dark:bg-gray-800 my-2"></div>
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-gray-900 dark:text-white">{{
+                                    langService.translate('booking.total')
+                                    }}</span>
+                                <span class="text-2xl font-bold text-primary-600 dark:text-primary-500">{{ totalPrice()
+                                    | currency }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Checkout Button -->
+                        <button (click)="proceedToPayment()" [disabled]="selectedSeats().length === 0 || loading()"
+                            class="w-full py-4 btn-primary rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none flex items-center justify-center gap-2">
+                            @if (loading()) {
+                            <div class="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent">
+                            </div>
+                            {{ langService.translate('booking.processing') }}
+                            } @else {
+                            <span>{{ langService.translate('booking.checkout') }}</span>
+                            <svg class="w-5 h-5 pointer-events-none" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                            </svg>
+                            }
+                        </button>
+
+                        <p class="text-xs text-center text-gray-400 mt-4">
+                            {{ langService.translate('booking.terms_agree') }}
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

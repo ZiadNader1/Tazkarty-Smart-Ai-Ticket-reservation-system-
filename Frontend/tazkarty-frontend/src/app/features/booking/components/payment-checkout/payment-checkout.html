@@ -1,0 +1,242 @@
+<div class="min-h-screen bg-gray-50 dark:bg-dark-bg py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="mb-12">
+            <app-booking-stepper [currentStep]="2"></app-booking-stepper>
+
+            <button (click)="goBack()"
+                class="group flex items-center text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 transition-colors mt-8">
+                <div
+                    class="w-8 h-8 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center group-hover:border-primary-300 dark:group-hover:border-primary-500 group-hover:shadow-md transition-all mr-2">
+                    <svg class="w-4 h-4 transform group-hover:-translate-x-0.5 transition-transform" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
+                        </path>
+                    </svg>
+                </div>
+                <span class="font-bold text-sm">{{ langService.translate('booking.back_to_overview') }}</span>
+            </button>
+
+            <div class="text-center mt-6">
+                <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl">
+                    {{ langService.translate('booking.secure_checkout') }}
+                </h2>
+                <p class="mt-4 text-lg text-gray-600 dark:text-gray-400">
+                    {{ langService.translate('booking.secure_checkout_desc') }}
+                </p>
+            </div>
+        </div>
+
+        @if (loading()) {
+        <div class="flex justify-center py-12">
+            <div class="spinner"></div>
+        </div>
+        } @else {
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+            <!-- Order Summary -->
+            <div class="space-y-6">
+                <div
+                    class="bg-white dark:bg-dark-card rounded-2xl shadow-xl overflow-hidden border border-gray-100 dark:border-gray-800">
+                    <div class="bg-gray-900 dark:bg-black px-6 py-4">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                            </svg>
+                            {{ langService.translate('booking.order_summary') }}
+                        </h3>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        @if (booking()) {
+                        <div
+                            class="flex justify-between items-start pb-4 border-b border-gray-100 dark:border-gray-800">
+                            <div>
+                                <h4 class="font-bold text-gray-900 dark:text-white text-lg">{{ getEventTitle() }}</h4>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">{{ getEventDate() | date:'medium' }}
+                                </p>
+                                <p class="text-xs text-primary-600 dark:text-primary-400 mt-1 font-medium">{{
+                                    getVenueName() }}</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="block text-2xl font-bold text-gray-900 dark:text-white">{{
+                                    booking()?.total_price | currency: (langService.currentLang() === 'ar' ? 'EGP' :
+                                    'USD')
+                                    }}</span>
+                                <span class="text-xs text-gray-500 dark:text-gray-400">{{
+                                    langService.translate('booking.total') }}</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                                <span>{{ langService.translate('nav.tickets') }}</span>
+                                <span>x{{ booking()?.seats?.length }}</span>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                                <span>{{ langService.translate('booking.booking_fee') }}</span>
+                                <span>{{ 0 | currency: (langService.currentLang() === 'ar' ? 'EGP' : 'USD') }}</span>
+                            </div>
+                        </div>
+
+                        <div
+                            class="pt-4 flex justify-between items-center font-bold text-gray-900 dark:text-white text-xl border-t border-gray-100 dark:border-gray-800">
+                            <span>{{ langService.translate('booking.total_pay') }}</span>
+                            <span>{{ booking()?.total_price | currency: (langService.currentLang() === 'ar' ? 'EGP' :
+                                'USD') }}</span>
+                        </div>
+                        }
+                    </div>
+                </div>
+
+                <div
+                    class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-100 dark:border-blue-800 flex gap-3">
+                    <div class="text-2xl text-blue-600 dark:text-blue-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-blue-900 dark:text-blue-300">{{
+                            langService.translate('booking.secure_payment_title') }}</h4>
+                        <p class="text-sm text-blue-700 dark:text-blue-400">{{
+                            langService.translate('booking.secure_payment_desc') }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Form -->
+            <div
+                class="bg-white dark:bg-dark-card rounded-2xl shadow-2xl p-6 lg:p-8 relative overflow-hidden text-gray-900 dark:text-white">
+                <!-- Background decorative blob -->
+                <div
+                    class="absolute -top-24 -right-24 w-48 h-48 bg-primary-100 dark:bg-primary-900/40 rounded-full blur-3xl opacity-50 pointer-events-none">
+                </div>
+
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2 relative z-10">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary-600 dark:text-primary-400"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+                    {{ langService.translate('booking.payment_details') }}
+                </h3>
+
+                <!-- Custom Credit Card UI -->
+                <div
+                    class="relative w-full aspect-[1.586/1] bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl shadow-2xl p-6 mb-8 text-white transition-all duration-500 transform hover:scale-[1.02]">
+                    <!-- Chip -->
+                    <div
+                        class="w-12 h-9 bg-yellow-400/20 border border-yellow-400/40 rounded-md mb-6 relative overflow-hidden">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-br from-transparent via-yellow-400/30 to-transparent">
+                        </div>
+                    </div>
+
+                    <!-- Card Number Placeholder/Input Area -->
+                    <div class="mb-4">
+                        <label class="text-xs text-gray-400 uppercase tracking-widest block mb-1">{{
+                            langService.translate('booking.card_number') }}</label>
+                        <div class="font-mono text-xl sm:text-2xl tracking-widest text-shadow-sm min-h-[32px]"
+                            id="card-number-display">
+                            <!-- Stripe Element Mounts Here visually if we want, or we keep it input based below -->
+                            **** **** **** ****
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-end">
+                        <div>
+                            <label class="text-xs text-gray-400 uppercase tracking-widest block mb-1">{{
+                                langService.translate('booking.card_holder') }}</label>
+                            <div class="font-medium tracking-wide uppercase truncate max-w-[140px]">{{ cardHolderName ||
+                                langService.translate('booking.name_on_card') }}</div>
+                        </div>
+                        <div class="text-right">
+                            <label class="text-xs text-gray-400 uppercase tracking-widest block mb-1">{{
+                                langService.translate('booking.expires') }}</label>
+                            <div class="font-mono text-lg">MM/YY</div>
+                        </div>
+                    </div>
+
+                    <!-- Logo -->
+                    <div class="absolute top-6 right-6">
+                        <svg class="h-8 md:h-10 opacity-80" viewBox="0 0 48 48" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M45 35c0 2.209-1.791 4-4 4H7c-2.209 0-4-1.791-4-4V13c0-2.209 1.791-4 4-4h34c2.209 0 4 1.791 4 4v22z"
+                                fill="#fff" fill-opacity=".1" />
+                            <path
+                                d="M45 35c0 2.209-1.791 4-4 4H7c-2.209 0-4-1.791-4-4V13c0-2.209 1.791-4 4-4h34c2.209 0 4 1.791 4 4v22z"
+                                stroke="#fff" stroke-width="2" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Stripe Element Container -->
+                <form (ngSubmit)="pay()" class="space-y-5 relative z-10">
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{
+                            langService.translate('booking.card_holder') }}</label>
+                        <input type="text" [(ngModel)]="cardHolderName" name="cardHolder"
+                            [placeholder]="langService.translate('contact.name_placeholder')"
+                            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition bg-gray-50/50 dark:bg-gray-800 dark:text-white"
+                            required>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{
+                            langService.translate('booking.card_info') }}</label>
+                        <div
+                            class="p-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-white focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-transparent transition shadow-sm">
+                            <ngx-stripe-card [options]="cardOptions" [elementsOptions]="elementsOptions"
+                                (change)="onChange($event)">
+                            </ngx-stripe-card>
+                        </div>
+                    </div>
+
+                    @if (paymentError()) {
+                    <div
+                        class="p-3 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-lg text-sm flex items-center gap-2 animate-fadeIn">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        {{ paymentError() }}
+                    </div>
+                    }
+
+                    <button type="submit" [disabled]="processing() || !booking()"
+                        class="w-full py-4 btn-primary rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center gap-2">
+                        @if (processing()) {
+                        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                            </circle>
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            </path>
+                        </svg>
+                        {{ langService.translate('booking.processing') }}
+                        } @else {
+                        {{ langService.translate('booking.pay_amount') }} {{ booking()?.total_price | currency:
+                        (langService.currentLang() === 'ar' ? 'EGP' : 'USD') }}
+                        }
+                    </button>
+
+                    <div class="text-center text-xs text-gray-400 mt-4">
+                        {{ langService.translate('booking.powered_by') }} <span
+                            class="font-bold text-gray-500 dark:text-gray-400">Stripe</span>
+                    </div>
+
+                </form>
+            </div>
+
+        </div>
+        }
+    </div>
+</div>

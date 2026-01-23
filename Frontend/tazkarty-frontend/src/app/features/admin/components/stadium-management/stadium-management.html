@@ -1,0 +1,399 @@
+<div class="min-h-screen bg-gray-50 dark:bg-dark-bg p-8 transition-colors duration-300">
+    <div class="max-w-7xl mx-auto">
+
+        <!-- Header Section -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 animate-fade-in">
+            <div>
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-primary-600" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    {{ langService.translate('admin.stadium_mgmt') }}
+                </h1>
+                <p class="text-gray-600 dark:text-gray-400 text-lg">{{ langService.translate('admin.stadium_mgmt_desc')
+                    }}</p>
+            </div>
+
+            <div class="flex gap-3">
+                <a routerLink="/admin/dashboard"
+                    class="px-6 py-4 bg-white dark:bg-dark-card text-gray-700 dark:text-gray-300 font-bold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-800 transition-all transform hover:scale-105 shadow-md flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    <span>{{ langService.translate('admin.dashboard') }}</span>
+                </a>
+                <button (click)="openAddModal()"
+                    class="px-6 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-bold rounded-xl hover:from-primary-700 hover:to-primary-800 transition-all transform hover:scale-105 shadow-lg flex items-center gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>{{ langService.translate('admin.add_stadium') }}</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Filters Bar -->
+        <div
+            class="bg-white dark:bg-dark-card rounded-2xl shadow-xl p-6 mb-8 border border-gray-100 dark:border-gray-800">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Search -->
+                <div class="md:col-span-2">
+                    <label
+                        class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        {{ langService.translate('admin.search_stadiums_placeholder') }}
+                    </label>
+                    <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange()"
+                        [placeholder]="langService.translate('admin.search_stadiums_placeholder')"
+                        class="w-full px-5 py-4 bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition text-lg dark:text-white" />
+                </div>
+
+                <!-- Status Filter -->
+                <div>
+                    <label
+                        class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                        </svg>
+                        {{ langService.translate('admin.status_filter') }}
+                    </label>
+                    <select [(ngModel)]="filterActive" (ngModelChange)="onFilterChange()"
+                        class="w-full px-5 py-4 bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 transition text-lg font-semibold dark:text-white">
+                        <option value="all">{{ langService.translate('admin.all_stadiums') }}</option>
+                        <option value="active">{{ langService.translate('admin.active_only') }}</option>
+                        <option value="inactive">{{ langService.translate('admin.inactive_only') }}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stadiums Grid -->
+        @if (loading) {
+        <div class="text-center py-20">
+            <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-600 mx-auto mb-6"></div>
+            <p class="text-gray-600 dark:text-gray-400 text-xl font-bold">{{
+                langService.translate('admin.loading_stadiums') }}</p>
+        </div>
+        } @else {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @for (stadium of filteredStadiums; track stadium._id) {
+            <div
+                class="bg-white dark:bg-dark-card rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 dark:border-gray-800 animate-slide-up flex flex-col">
+
+                <!-- Stadium Top Image -->
+                <div class="relative h-56 bg-gray-200 dark:bg-gray-800">
+                    @if (stadium.image) {
+                    <img [src]="getImageUrl(stadium.image)" [alt]="stadium.name" class="w-full h-full object-cover">
+                    } @else {
+                    <div
+                        class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-dark-bg dark:to-dark-card">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                    </div>
+                    }
+
+                    <div class="absolute top-4 right-4">
+                        <span class="px-3 py-1 rounded-full text-xs font-bold shadow-lg flex items-center gap-2"
+                            [class.bg-green-500]="stadium.is_active" [class.text-white]="stadium.is_active"
+                            [class.bg-red-500]="!stadium.is_active" [class.text-white]="!stadium.is_active">
+                            <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
+                            {{ stadium.is_active ? langService.translate('admin.active_badge') :
+                            langService.translate('admin.inactive_badge') }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Card Content -->
+                <div class="p-6 flex-1 flex flex-col">
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ stadium.name }}</h3>
+                    <p class="text-gray-500 dark:text-gray-400 mb-4 flex items-center gap-2 text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary-500" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        {{ stadium.city }}{{ stadium.city ? ',' : '' }} {{ stadium.location }}
+                    </p>
+
+                    <div class="space-y-3 mb-6 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-semibold text-gray-600 dark:text-gray-400">{{
+                                langService.translate('admin.sections') }}:</span>
+                            <span class="font-bold text-gray-900 dark:text-white">{{ stadium.halls?.length || 0
+                                }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-semibold text-gray-600 dark:text-gray-400">{{
+                                langService.translate('admin.capacity') }}:</span>
+                            <span class="font-bold text-gray-900 dark:text-white">{{ stadium.capacity || 0 }}</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto space-y-3">
+                        <button (click)="openViewModal(stadium)"
+                            class="w-full py-3 bg-primary-600 text-white rounded-xl font-bold hover:bg-primary-700 transition flex items-center justify-center gap-2 shadow-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            {{ langService.translate('admin.manage_zones') }}
+                        </button>
+
+                        <div class="grid grid-cols-3 gap-2">
+                            <button (click)="openViewModal(stadium)"
+                                class="bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 p-2.5 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition flex justify-center"
+                                [title]="langService.translate('admin.view')">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </button>
+                            <button (click)="openEditModal(stadium)"
+                                class="bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 p-2.5 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/40 transition flex justify-center"
+                                [title]="langService.translate('admin.edit')">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 00-2 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                            </button>
+                            <button (click)="openDeleteModal(stadium)"
+                                class="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-2.5 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/40 transition flex justify-center"
+                                [title]="langService.translate('admin.delete')">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            } @empty {
+            <div
+                class="col-span-full text-center py-20 bg-white dark:bg-dark-card rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 text-gray-300 dark:text-gray-700 mx-auto mb-6"
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-3">{{
+                    langService.translate('admin.no_stadiums_found') }}</h3>
+                <p class="text-gray-500 dark:text-gray-400 text-lg mb-8">{{
+                    langService.translate('admin.stadium_usage_desc') }}</p>
+                <button (click)="openAddModal()"
+                    class="px-8 py-4 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 transition shadow-xl inline-flex items-center gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    {{ langService.translate('admin.add_first_stadium') }}
+                </button>
+            </div>
+            }
+        </div>
+        }
+    </div>
+</div>
+
+<!-- Modal Container -->
+@if (showModal) {
+<div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in"
+    (click)="closeModal()">
+    <div class="bg-white dark:bg-dark-card rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-scale-in border border-gray-100 dark:border-gray-800"
+        (click)="$event.stopPropagation()">
+
+        <div
+            class="bg-gradient-to-r from-primary-600 to-primary-700 text-white p-8 rounded-t-3xl sticky top-0 z-10 flex justify-between items-center">
+            <h2 class="text-3xl font-bold flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                {{ isEditMode ? langService.translate('admin.edit') : langService.translate('admin.create') }}
+            </h2>
+            <button (click)="closeModal()" class="text-white hover:text-gray-200 text-4xl leading-none">&times;</button>
+        </div>
+
+        <div class="p-8 space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">{{
+                        langService.translate('admin.stadium_name') }}</label>
+                    <input type="text" [(ngModel)]="stadiumForm.name" class="form-input-premium w-full" />
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">{{
+                        langService.translate('admin.location') }}</label>
+                    <input type="text" [(ngModel)]="stadiumForm.location" class="form-input-premium w-full" />
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">{{
+                        langService.translate('admin.city') }}</label>
+                    <input type="text" [(ngModel)]="stadiumForm.city" class="form-input-premium w-full" />
+                </div>
+                <!-- Add other fields as needed using same pattern -->
+            </div>
+        </div>
+
+        <div
+            class="p-8 border-t border-gray-100 dark:border-gray-800 flex gap-4 bg-gray-50 dark:bg-dark-card rounded-b-3xl sticky bottom-0">
+            <button (click)="closeModal()" class="btn-secondary flex-1">{{ langService.translate('admin.cancel')
+                }}</button>
+            <button (click)="saveStadium()" class="btn-primary flex-1">{{ langService.translate('admin.save')
+                }}</button>
+        </div>
+    </div>
+</div>
+}
+
+<!-- View Details Modal -->
+@if (showViewModal && viewingStadium) {
+<div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in"
+    (click)="closeViewModal()">
+    <div class="bg-white dark:bg-dark-card rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto animate-scale-in border border-gray-100 dark:border-gray-800"
+        (click)="$event.stopPropagation()">
+
+        <div
+            class="bg-gradient-to-r from-primary-600 to-primary-700 text-white p-8 rounded-t-3xl sticky top-0 z-10 flex justify-between items-center">
+            <h2 class="text-3xl font-bold flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                {{ viewingStadium.name }}
+            </h2>
+            <button (click)="closeViewModal()"
+                class="text-white hover:text-gray-200 text-4xl leading-none">&times;</button>
+        </div>
+
+        <div class="p-8 space-y-8">
+            <!-- Sections Management -->
+            <div class="space-y-4">
+                <div class="flex justify-between items-center border-b dark:border-gray-800 pb-4">
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">{{
+                        langService.translate('admin.sections') }}</h3>
+                    <button (click)="openAddHallModal()"
+                        class="px-5 py-2.5 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        {{ langService.translate('admin.add_section') }}
+                    </button>
+                </div>
+
+                @if (viewingStadium.halls && viewingStadium.halls.length > 0) {
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    @for (hall of viewingStadium.halls; track hall._id) {
+                    <div
+                        class="p-5 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 group hover:shadow-lg transition">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-1">{{ hall.name }}</h4>
+                                <div class="flex gap-2">
+                                    <span
+                                        class="px-2 py-0.5 bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 text-[10px] font-bold uppercase rounded-md tracking-wider">
+                                        {{ hall.section_side }}
+                                    </span>
+                                    <span
+                                        class="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-[10px] font-bold uppercase rounded-md tracking-wider">
+                                        {{ hall.gate }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button (click)="openEditHallModal(hall)"
+                                    class="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition"
+                                    [title]="langService.translate('admin.edit')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 00-2 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                </button>
+                                <button (click)="deleteHall(hall._id)"
+                                    class="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition"
+                                    [title]="langService.translate('admin.delete')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <p class="text-gray-600 dark:text-gray-400">{{ langService.translate('admin.capacity') }}:
+                                <span class="text-gray-900 dark:text-white font-bold">{{ hall.capacity }}</span></p>
+                            <p class="text-gray-600 dark:text-gray-400">{{ langService.translate('admin.default_price')
+                                }}: <span class="text-primary-600 font-bold">{{ hall.base_price }} EGP</span></p>
+                        </div>
+                    </div>
+                    }
+                </div>
+                } @else {
+                <div
+                    class="text-center py-10 bg-gray-50 dark:bg-gray-800 rounded-3xl border border-dashed border-gray-300 dark:border-gray-700">
+                    <p class="text-gray-500 italic">{{ langService.translate('admin.no_sections_added') }}</p>
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+}
+
+<!-- Delete Confirmation Modal -->
+@if (showDeleteModal && deletingStadium) {
+<div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-fade-in">
+    <div
+        class="bg-white dark:bg-dark-card rounded-3xl shadow-2xl max-w-md w-full p-8 animate-scale-in border border-gray-100 dark:border-gray-800">
+        <div class="text-center mb-8">
+            <div
+                class="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-red-600" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ langService.translate('admin.delete')
+                }}?</h3>
+            <p class="text-gray-600 dark:text-gray-400">{{ deletingStadium.name }}</p>
+        </div>
+        <div class="flex gap-4">
+            <button (click)="closeDeleteModal()" class="btn-secondary flex-1">{{ langService.translate('admin.cancel')
+                }}</button>
+            <button (click)="confirmDelete()"
+                class="px-6 py-4 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition flex-1 shadow-lg shadow-red-900/20">{{
+                langService.translate('admin.delete') }}</button>
+        </div>
+    </div>
+</div>
+}

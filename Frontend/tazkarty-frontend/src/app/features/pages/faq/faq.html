@@ -1,0 +1,90 @@
+<div class="relative min-h-screen overflow-hidden">
+    <!-- Video Background -->
+    <video autoplay muted loop playsinline class="absolute top-0 left-0 w-full h-full object-cover z-0">
+        <source src="/q%20and%20a.mp4" type="video/mp4">
+    </video>
+
+    <!-- Overlay for Dark Premium Look -->
+    <div
+        class="absolute top-0 left-0 w-full h-full bg-dark-bg/80 backdrop-blur-[2px] z-10 transition-colors duration-300">
+    </div>
+
+    <!-- Content -->
+    <div class="relative z-20 min-h-screen py-24 pt-32">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <div class="text-center mb-16 animate-fade-in">
+                <span
+                    class="inline-block px-4 py-1.5 rounded-full bg-primary-600/20 text-primary-500 font-bold uppercase tracking-wider text-xs mb-4">
+                    {{ langService.translate('faq.support_center') }}
+                </span>
+                <h1 class="text-5xl font-black text-white mt-2 mb-6 tracking-tight">
+                    {{ langService.translate('faq.title_white') }} <span class="text-primary-500">{{
+                        langService.translate('faq.title_green') }}</span>
+                </h1>
+
+                <p class="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
+                    {{ langService.translate('faq.subtitle') }}
+                </p>
+            </div>
+
+            <div class="space-y-4">
+                @for (item of faqs; track $index) {
+                <div class="group bg-dark-card/40 backdrop-blur-md rounded-2xl border border-white/5 hover:border-primary-500/30 overflow-hidden transition-all duration-500"
+                    [class.shadow-2xl]="openIndex() === $index" [class.bg-dark-card/80]="openIndex() === $index"
+                    [class.border-primary-500/50]="openIndex() === $index">
+
+                    <button (click)="toggle($index)"
+                        class="w-full flex justify-between items-center p-7 text-left focus:outline-none transition-colors">
+                        <span class="text-xl font-bold text-white group-hover:text-primary-400 transition-colors pr-8">
+                            {{ item.question }}
+                        </span>
+                        <div class="w-10 h-10 rounded-xl bg-white/5 group-hover:bg-primary-600/20 flex items-center justify-center transition-all duration-500 flex-shrink-0"
+                            [class.rotate-180]="openIndex() === $index" [class.bg-primary-600]="openIndex() === $index"
+                            [class.text-white]="openIndex() === $index">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                    d="M19 9l-7 7-7-7">
+                                </path>
+                            </svg>
+                        </div>
+                    </button>
+
+                    <div class="transition-all duration-500 ease-in-out overflow-hidden"
+                        [style.max-height]="openIndex() === $index ? '500px' : '0px'"
+                        [style.opacity]="openIndex() === $index ? '1' : '0'">
+                        <div class="p-7 pt-0 text-gray-400 text-lg leading-relaxed border-t border-white/5">
+                            {{ item.answer }}
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+
+            <!-- Still have questions? -->
+            <div
+                class="mt-20 p-10 bg-gradient-to-br from-primary-600/20 to-secondary-600/20 backdrop-blur-xl rounded-3xl text-center border border-white/10 shadow-2xl">
+                <div
+                    class="w-16 h-16 bg-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-primary-600/40">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                        </path>
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-black text-white mb-3">{{
+                    langService.translate('faq.still_questions') }}</h3>
+                <p class="text-gray-300 mb-8 text-lg">{{ langService.translate('faq.still_desc') }}</p>
+                <a routerLink="/contact"
+                    class="inline-flex items-center gap-2 px-10 py-4 bg-primary-600 text-white font-black rounded-2xl hover:bg-primary-700 transition-all shadow-xl hover:shadow-primary-600/25 transform hover:-translate-y-1">
+                    {{ langService.translate('faq.contact_support') }}
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                    </svg>
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>

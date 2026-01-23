@@ -1,0 +1,49 @@
+<div class="min-h-screen bg-gray-50 dark:bg-dark-bg py-12 relative overflow-hidden transition-colors duration-300">
+
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <!-- Progress Stepper -->
+        <div class="mb-16">
+            <app-booking-stepper [currentStep]="3"></app-booking-stepper>
+        </div>
+
+        <!-- Success Message -->
+        <div class="text-center mb-12 animate-slideUp">
+            <div
+                class="inline-block p-6 bg-green-500 rounded-full shadow-xl shadow-green-500/30 mb-6 ring-8 ring-green-50 dark:ring-green-900/20">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-white" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+            <h1 class="text-5xl font-extrabold text-gray-900 dark:text-white mb-4 tracking-tight">
+                {{ langService.translate('booking.confirmed') }}
+            </h1>
+            <p class="text-xl text-gray-600 dark:text-gray-400 max-w-lg mx-auto">
+                {{ langService.translate('booking.confirmed_desc') }}
+            </p>
+        </div>
+
+        @if (loading()) {
+        <div class="flex justify-center p-12">
+            <div class="spinner"></div>
+        </div>
+        } @else {
+        @if (isSportsEvent()) {
+        <app-confirmation-sports [booking]="booking()" [ticketId]="ticketId"></app-confirmation-sports>
+        } @else {
+        <app-confirmation-entertainment [booking]="booking()" [ticketId]="ticketId"></app-confirmation-entertainment>
+        }
+        }
+
+        <!-- Back to Home -->
+        <div class="mt-12 text-center">
+            <a routerLink="/" class="btn-primary inline-flex items-center gap-2 px-8 py-3">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                {{ langService.translate('booking.return_home') }}
+            </a>
+        </div>
+    </div>
+</div>

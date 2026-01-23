@@ -1,0 +1,250 @@
+<div class="max-w-6xl mx-auto py-8 px-4">
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+    <div>
+      <a routerLink="/admin/dashboard" class="text-sm text-gray-500 hover:text-gray-900 mb-1 inline-block font-bold">←
+        Back to Dashboard</a>
+      <h1 class="text-3xl font-bold text-gray-900">Manage Shows</h1>
+      @if (event()) {
+      <div class="flex items-center gap-2 mt-2">
+        <h2 class="text-xl text-primary-600 font-semibold">{{ event()!.title }}</h2>
+        <span class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-sm">{{ event()!.duration_minutes }} min</span>
+      </div>
+      }
+    </div>
+
+    <div class="text-sm bg-blue-50 text-blue-700 px-4 py-2 rounded-lg border border-blue-100">
+      <strong>Note:</strong> Create shows here. Seat Maps will be drawn in the "Seats" module.
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+    <!-- List of Existing Shows -->
+    <div class="lg:col-span-2">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div
+          class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div class="flex items-center gap-2">
+            <h3 class="font-bold text-gray-700">Existing Shows</h3>
+            <span class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full text-xs font-bold">{{ filteredShows().length
+              }}</span>
+          </div>
+          <input type="text" placeholder="🔍 Filter by show or hall..." [value]="searchQuery()"
+            (input)="searchQuery.set($any($event.target).value)"
+            class="w-full md:w-64 px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
+        </div>
+
+        @if (loading() && shows().length === 0) {
+        <div class="p-8 text-center text-gray-500">Loading shows...</div>
+        } @else if (filteredShows().length === 0) {
+        <div class="p-8 text-center text-gray-500">
+          <div class="text-4xl mb-2">🎭</div>
+          <p>No shows found matching your filter.</p>
+        </div>
+        } @else {
+        <div class="divide-y divide-gray-100">
+          @for (show of filteredShows(); track show._id) {
+          <div class="p-6 hover:bg-gray-50 transition flex justify-between items-center group">
+            <div>
+              <div class="flex items-center gap-3">
+                @if (show.poster_url) {
+                <img [src]="'http://localhost:5000/' + show.poster_url" alt="Poster"
+                  class="w-12 h-16 object-cover rounded shadow-sm border border-gray-200">
+                }
+                <span class="font-mono font-bold text-lg text-gray-900">
+                  {{ show.start_time | date:'shortDate' }}
+                </span>
+                <span class="px-2 py-0.5 bg-gray-900 text-white rounded text-sm font-bold">
+                  {{ show.start_time | date:'shortTime' }}
+                </span>
+                <span class="text-xs uppercase font-bold tracking-wider px-2 py-0.5 rounded"
+                  [class.bg-green-100]="show.is_active" [class.text-green-700]="show.is_active"
+                  [class.bg-red-100]="!show.is_active" [class.text-red-700]="!show.is_active">
+                  {{ show.is_active ? 'Active' : 'Inactive' }}
+                </span>
+
+                <!-- Seat Map Badge -->
+                @if (hasSeatMap(show)) {
+                <span
+                  class="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 border border-green-200 flex items-center gap-1">
+                  🟢 Seat Map Ready
+                </span>
+                } @else {
+                <span
+                  class="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700 border border-red-200 flex items-center gap-1">
+                  🔴 Seat Map Missing
+                </span>
+                }
+              </div>
+              <div class="mt-1 text-sm text-gray-500 flex gap-4">
+                @if (show.title) {
+                <span class="font-bold text-primary-600">{{ show.title }}</span>
+                }
+                <span>📍 {{ getHallName(show) }}</span>
+                <span>💰 ${{ show.price }}</span>
+                <span>💺 {{ show.available_seats || getHallCapacity(show) }} / {{ show.total_seats ||
+                  getHallCapacity(show) }}</span>
+              </div>
+
+              @if (getHallCategories(show).length > 0) {
+              <div class="mt-2 text-xs flex gap-2 flex-wrap">
+                @for(cat of getHallCategories(show); track cat.name) {
+                <span class="px-2 py-1 bg-gray-100 rounded border border-gray-200 text-gray-600">
+                  {{ cat.name }}: {{ cat.count }} seats
+                </span>
+                }
+              </div>
+              }
+            </div>
+
+            <div class="opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+              <button (click)="onEdit(show)"
+                class="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-100 text-gray-600">
+                Edit
+              </button>
+              <button (click)="onDelete(show)"
+                class="px-3 py-1.5 text-sm border border-red-200 rounded hover:bg-red-50 text-red-600">
+                Delete
+              </button>
+            </div>
+          </div>
+          }
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Create/Edit Show Form -->
+    <div class="lg:col-span-1">
+      <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 sticky top-8">
+        <h3 class="font-bold text-lg mb-4 text-gray-900 border-b pb-2">
+          {{ editingShowId() ? 'Edit Show' : 'Add New Show' }}
+        </h3>
+
+        <form [formGroup]="showForm" (ngSubmit)="onSubmit()" class="space-y-4">
+
+          @if (!eventId) {
+          <div class="space-y-4 border-b border-gray-100 pb-4 mb-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Show Title</label>
+              <input type="text" formControlName="title" placeholder="e.g. Cinema Movie Name"
+                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 p-2 border">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <textarea formControlName="description" rows="3" placeholder="Enter show description..."
+                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 p-2 border"></textarea>
+            </div>
+          </div>
+          }
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Venue</label>
+            <select formControlName="venue_id"
+              class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 p-2 border">
+              <option value="">Select Venue</option>
+              @for (venue of venues(); track venue._id) {
+              <option [value]="venue._id">{{ venue.name }} - {{ venue.location }}</option>
+              }
+            </select>
+            @if (venues().length === 0 && !loading()) {
+            <p class="text-xs text-red-500 mt-1">No venues found. Please create a venue first.</p>
+            }
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Hall</label>
+            @if (halls().length > 0) {
+            <select formControlName="hall_id"
+              class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 p-2 border">
+              <option value="">Select Hall</option>
+              @for (hall of halls(); track hall._id) {
+              <option [value]="hall._id">{{ hall.name }} (Cap: {{hall.capacity}})</option>
+              }
+            </select>
+            } @else {
+            <div class="text-sm text-gray-500 italic p-2 bg-gray-50 rounded border">
+              @if (showForm.get('venue_id')?.value) { No halls found for this venue. }
+              @else { Select a venue first. }
+            </div>
+            }
+
+            @if (showForm.get('hall_id')?.value) {
+            <div class="mt-2 text-sm flex items-center gap-2">
+              @if (selectedHallHasMap()) {
+              <span class="text-green-600 font-bold flex items-center gap-1">
+                ✅ Seat Map Available
+              </span>
+              } @else {
+              <span class="text-red-600 font-bold flex items-center gap-1">
+                ⚠️ No Seat Map Configured
+              </span>
+              }
+            </div>
+            }
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Show Poster</label>
+            @if (currentPosterUrl()) {
+            <div class="mb-2">
+              <img [src]="'http://localhost:5000/' + currentPosterUrl()" alt="Current Poster"
+                class="h-32 object-contain rounded border border-gray-200 bg-gray-50">
+              <p class="text-xs text-gray-400 mt-1">Current Poster</p>
+            </div>
+            }
+            <input type="file" (change)="onPosterSelected($event)" accept="image/*"
+              class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100">
+            <p class="text-xs text-gray-500 mt-1">Optional. Overrides event poster.</p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Date & Time</label>
+            <input type="datetime-local" formControlName="start_time"
+              class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 p-2 border">
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Price ($)</label>
+              <input type="number" formControlName="price"
+                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 p-2 border">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Total Seats</label>
+              <input type="number" formControlName="total_seats"
+                class="w-full rounded-lg border-gray-200 bg-gray-100 text-gray-500 shadow-sm cursor-not-allowed p-2 border">
+              <p class="text-xs text-gray-500 mt-1">Defined by Hall config</p>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <select formControlName="status"
+              class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 p-2 border">
+              <option value="active">Active</option>
+              <option value="sold_out">Sold Out</option>
+              <option value="hidden">Hidden (Draft)</option>
+            </select>
+          </div>
+
+          <div class="pt-2 flex gap-2">
+            @if (editingShowId()) {
+            <button type="button" (click)="cancelEdit()"
+              class="w-1/3 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-bold transition-all">
+              Cancel
+            </button>
+            }
+            <button type="submit" [disabled]="showForm.invalid || loading()"
+              class="w-full py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 font-bold shadow-md transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+              @if (loading()) { {{ editingShowId() ? 'Updating...' : 'Creating...' }} }
+              @else { {{ editingShowId() ? '💾 Update Show' : '➕ Add Show' }} }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

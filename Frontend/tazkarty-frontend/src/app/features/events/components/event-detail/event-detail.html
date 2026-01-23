@@ -1,0 +1,460 @@
+@if (loading()) {
+<div class="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-dark-bg">
+    <div class="text-center">
+        <div class="spinner mx-auto mb-4">
+        </div>
+        <p class="text-gray-500 dark:text-gray-400 font-medium">{{ langService.translate('events.loading_details') }}
+        </p>
+    </div>
+</div>
+} @else if (event()) {
+<div class="min-h-screen bg-gray-50 dark:bg-dark-bg pb-20 transition-colors duration-300">
+    <!-- Hero Section -->
+    <div class="relative h-[60vh] bg-gray-900 overflow-hidden group">
+        <!-- Background Image with Parallax/Blur -->
+        <div class="absolute inset-0">
+            @if (event()!.poster_url) {
+            <img [src]="event()!.poster_url"
+                class="w-full h-full object-cover blur-sm opacity-40 scale-105 group-hover:scale-110 transition-transform duration-1000">
+            }
+            <div
+                class="absolute inset-0 bg-gradient-to-t from-gray-50 dark:from-dark-bg via-gray-900/60 to-transparent">
+            </div>
+        </div>
+
+        <!-- Hero Content -->
+        <div class="absolute bottom-0 left-0 right-0 p-6 md:p-12 mb-8">
+            <div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-8 items-end">
+                <!-- Poster Card -->
+                <div
+                    class="hidden md:block w-64 h-96 flex-shrink-0 bg-white dark:bg-gray-800 p-1 rounded-xl shadow-2xl skew-y-1 transform origin-bottom-left hover:skew-0 transition-transform duration-500 border border-gray-200 dark:border-gray-700">
+                    <img [src]="event()!.poster_url" class="w-full h-full object-cover rounded-lg"
+                        onerror="this.src='/assets/placeholder-event.svg'">
+                </div>
+
+                <!-- Text Content -->
+                <div class="flex-1 text-white z-10">
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span
+                            class="px-3 py-1 bg-primary-600/90 backdrop-blur-md rounded-full text-sm font-bold uppercase tracking-wide shadow-sm">
+                            {{ event()!.type }}
+                        </span>
+                        <span
+                            class="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-sm font-medium border border-white/10">
+                            {{ event()!.duration_minutes }} min
+                        </span>
+                        @if (event()!.rating) {
+                        <span
+                            class="px-3 py-1 bg-yellow-500/90 text-black backdrop-blur-md rounded-full text-sm font-bold flex items-center gap-1 shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" aria-hidden="true"
+                                fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.48-8.279-6.064-5.828 8.332-1.151z" />
+                            </svg>
+                            {{ event()!.rating }}
+                        </span>
+                        }
+                    </div>
+
+                    <h1
+                        class="text-4xl md:text-6xl font-black mb-4 tracking-tight leading-none text-white drop-shadow-lg">
+                        {{ langService.translate(event()!.title) }}
+                    </h1>
+
+                    <div class="flex items-center gap-6 text-gray-200 text-lg">
+                        <span class="flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary-400" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            {{ getVenueName() }}
+                            @if (getVenueLocation()) {
+                            <span class="text-gray-400 text-base ml-1">({{ getVenueLocation() }})</span>
+                            }
+                        </span>
+                        <span class="flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary-400" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            {{ event()!.release_date | date:'mediumDate' }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative z-20">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- Left Column -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- About -->
+                <div
+                    class="bg-white dark:bg-dark-card rounded-2xl shadow-sm p-8 border border-gray-100 dark:border-gray-800">
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">{{
+                        langService.translate('events.about') }}</h2>
+                    <p class="text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-line">
+                        {{ event()!.description || 'No description available for this event.' }}
+                    </p>
+                </div>
+
+                @if (event()!.type === 'sports') {
+                <!-- Sports: Select Section -->
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">{{
+                    langService.translate('events.select_section') }}</h2>
+
+                <!-- 2D Stadium Layout Image -->
+                @if (getStadiumLayoutImage()) {
+                <div class="mb-8 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
+                    <img [src]="getStadiumLayoutImage()" alt="Stadium Layout"
+                        class="w-full h-auto object-cover max-h-[400px]">
+                </div>
+                }
+
+                @if (halls().length > 0) {
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    @for (hall of halls(); track hall._id) {
+                    <div class="p-6 rounded-xl border-2 border-gray-100 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 transition-all duration-200 bg-white dark:bg-dark-card hover:shadow-md group cursor-pointer"
+                        (click)="bookSection(hall)" [class.border-primary-600]="selectedSection()?._id === hall._id"
+                        [class.bg-primary-50]="selectedSection()?._id === hall._id"
+                        [class.dark:bg-primary-900/10]="selectedSection()?._id === hall._id">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3
+                                    class="text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                                    {{ hall.name }}
+                                </h3>
+
+                                <!-- Allocation Badge -->
+                                @if (hall.section_side === 'home') {
+                                <span
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 mt-2 gap-1 uppercase tracking-wider">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20"
+                                        fill="currentColor">
+                                        <path
+                                            d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                                    </svg>
+                                    {{ langService.translate('team.' + event()!.home_team) }}
+                                </span>
+                                } @else if (hall.section_side === 'away') {
+                                <span
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 mt-2 gap-1 uppercase tracking-wider">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20"
+                                        fill="currentColor">
+                                        <path
+                                            d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                                    </svg>
+                                    {{ langService.translate('team.' + event()!.away_team) }}
+                                </span>
+                                } @else {
+                                <span
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 mt-2 uppercase tracking-wider">
+                                    {{ langService.translate('common.general') }}
+                                </span>
+                                }
+                            </div>
+
+                            <div class="text-right">
+                                <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">{{
+                                    langService.translate('events.price') }}</div>
+                                <div class="text-xl font-bold text-primary-600 dark:text-primary-400">
+                                    {{ hall.base_price | currency }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            class="flex items-center justify-between mt-4 pt-4 border-t border-gray-50 dark:border-gray-700/50">
+                            <div class="text-sm text-gray-500 dark:text-gray-400">
+                                {{ langService.translate('events.gate') }}: <span
+                                    class="font-medium text-gray-900 dark:text-white">{{ hall.gate || 'Any'
+                                    }}</span>
+                            </div>
+                            <button (click)="bookSection(hall); $event.stopPropagation()"
+                                class="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg font-bold hover:bg-primary-600 dark:hover:bg-gray-200 transition">
+                                {{ langService.translate('common.select') }}
+                            </button>
+                        </div>
+                    </div>
+                    }
+                </div>
+                } @else {
+                <div
+                    class="text-center py-12 bg-gray-50 dark:bg-dark-card rounded-xl border border-dashed border-gray-200 dark:border-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 mb-3" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    <p class="text-gray-500 dark:text-gray-400 font-medium">{{
+                        langService.translate('events.no_sections') }}</p>
+                </div>
+                }
+
+                } @else {
+                <!-- Standard: Select Showtime -->
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">{{
+                    langService.translate('events.select_showtime') }}</h2>
+
+                @if (loadingShows()) {
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 animate-pulse">
+                    @for(i of [1,2,3]; track i) {
+                    <div class="h-24 bg-gray-200 dark:bg-gray-700 rounded-xl"></div>
+                    }
+                </div>
+                } @else if (shows().length > 0) {
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    @for (show of shows(); track show._id) {
+                    <button (click)="selectShow(show)"
+                        class="group relative p-4 rounded-xl border-2 text-left transition-all duration-200"
+                        [class.border-gray-100]="selectedShow()?._id !== show._id"
+                        [class.dark:border-gray-700]="selectedShow()?._id !== show._id"
+                        [class.bg-white]="selectedShow()?._id !== show._id"
+                        [class.dark:bg-dark-card]="selectedShow()?._id !== show._id"
+                        [class.hover:border-primary-300]="selectedShow()?._id !== show._id"
+                        [class.border-primary-600]="selectedShow()?._id === show._id"
+                        [class.bg-primary-50]="selectedShow()?._id === show._id"
+                        [class.dark:bg-primary-900/10]="selectedShow()?._id === show._id"
+                        [class.shadow-md]="selectedShow()?._id === show._id">
+
+                        <div class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                            {{ show.start_time | date:'shortTime' }}
+                        </div>
+                        <div
+                            class="text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400">
+                            {{ show.start_time | date:'MMM d' }}
+                        </div>
+                        <div class="mt-3 flex justify-between items-end">
+                            <span
+                                class="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-gray-600 dark:text-gray-300">
+                                {{ show.available_seats }} {{ langService.translate('profile.seats') }}
+                            </span>
+                            <span class="font-bold text-primary-600 dark:text-primary-400">
+                                {{ show.price | currency }}
+                            </span>
+                        </div>
+
+                        @if (selectedShow()?._id === show._id) {
+                        <div
+                            class="absolute -top-3 -right-3 w-6 h-6 bg-primary-600 rounded-full flex items-center justify-center text-white shadow-sm ring-2 ring-white dark:ring-dark-bg">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        }
+                    </button>
+                    }
+                </div>
+                } @else {
+                <div
+                    class="text-center py-12 bg-gray-50 dark:bg-dark-card rounded-xl border border-dashed border-gray-200 dark:border-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 mb-3" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <p class="text-gray-500 dark:text-gray-400 font-medium">{{ langService.translate('events.no_shows')
+                        }}</p>
+                </div>
+                }
+                }
+            </div>
+        </div>
+
+        <!-- Right Sidebar (Sticky Booking Card) -->
+        <div class="lg:col-span-1" id="booking-card">
+            <div
+                class="sticky top-8 bg-white dark:bg-dark-card rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+                <div class="p-6 bg-gradient-to-br from-primary-600 to-orange-500 text-white">
+                    <h3 class="text-xl font-bold">{{ langService.translate('events.booking_details') }}</h3>
+                    <p class="text-primary-100 text-sm">{{ langService.translate('events.secure_spot') }}</p>
+                </div>
+
+                <div class="p-6 space-y-6">
+                    @if (event()!.type === 'sports') {
+                    <!-- SPORTS BOOKING SIDEBAR -->
+                    @if (selectedSection()) {
+                    <div class="space-y-4">
+                        <!-- Selected Section Info -->
+                        <div
+                            class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700">
+                            <div class="text-sm text-gray-500 dark:text-gray-400">{{
+                                langService.translate('events.selected_section') }}</div>
+                            <div class="font-bold text-gray-900 dark:text-white">{{ selectedSection().name }}</div>
+                            <div class="text-primary-600 dark:text-primary-400 font-bold">{{
+                                selectedSection().base_price | currency }} / {{
+                                langService.translate('booking.tickets_count') }}</div>
+                        </div>
+
+                        <!-- User Info (Auto-filled) -->
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{
+                                langService.translate('events.fan_id') }}</label>
+                            <input type="text" [value]="user() ? user()!._id : 'Guest'" readonly
+                                class="w-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-600 dark:text-gray-300 cursor-not-allowed">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{
+                                langService.translate('events.full_name') }}</label>
+                            <input type="text" [value]="user() ? user()!.name : ''"
+                                class="w-full border border-gray-300 dark:border-gray-600 dark:bg-dark-bg dark:text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                        </div>
+
+                        <!-- Ticket Counter -->
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{
+                                langService.translate('events.ticket_count') }} (Max 4)</label>
+                            <div class="flex items-center gap-3">
+                                <button (click)="updateTickets(-1)" [disabled]="ticketCount() <= 1"
+                                    class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 font-bold">-</button>
+                                <span class="text-lg font-bold w-4 text-center dark:text-white">{{ ticketCount()
+                                    }}</span>
+                                <button (click)="updateTickets(1)" [disabled]="ticketCount() >= 4"
+                                    class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 font-bold">+</button>
+                            </div>
+                        </div>
+
+                        <!-- Discount Code -->
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{{
+                                langService.translate('events.discount_code') }}</label>
+                            <div class="flex gap-2">
+                                <input type="text" [placeholder]="langService.translate('events.discount_placeholder')"
+                                    #discountInput (input)="discountCode.set(discountInput.value)"
+                                    class="flex-1 border border-gray-300 dark:border-gray-600 dark:bg-dark-bg dark:text-white rounded-lg px-3 py-2 text-sm">
+                                <button (click)="applyDiscount()"
+                                    class="px-3 py-2 bg-gray-800 dark:bg-gray-700 text-white rounded-lg text-sm hover:bg-gray-900 dark:hover:bg-gray-600">
+                                    {{ langService.translate('events.apply') }}
+                                </button>
+                            </div>
+                            @if (discountApplied()) {
+                            <p class="text-xs text-green-600 dark:text-green-400 mt-1 flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                                {{ langService.translate('events.discount_success') }}
+                            </p>
+                            }
+                        </div>
+
+                        <!-- Total & Action -->
+                        <div class="pt-4 border-t border-gray-100 dark:border-gray-700">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-gray-600 dark:text-gray-400">{{
+                                    langService.translate('events.total_amount') }}</span>
+                                <span class="text-2xl font-bold text-primary-600 dark:text-primary-400">{{ total |
+                                    currency }}</span>
+                            </div>
+
+                            <button (click)="proceedToPayment()"
+                                class="w-full py-4 btn-primary rounded-xl font-bold text-lg hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0">
+                                {{ langService.translate('events.book_now') }} →
+                            </button>
+                            <p class="text-center text-xs text-gray-400 mt-3">
+                                {{ langService.translate('events.secure_proceed') }}
+                            </p>
+                        </div>
+                    </div>
+                    } @else {
+                    <div class="text-center py-8">
+                        <div
+                            class="w-16 h-16 bg-primary-50 dark:bg-primary-900/10 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl text-primary-600 dark:text-primary-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 font-medium">{{
+                            langService.translate('events.section_guide') }}</p>
+                    </div>
+                    }
+                    } @else {
+                    <!-- STANDARD SHOWTIME SIDEBAR -->
+                    @if (selectedShow()) {
+                    <div class="space-y-4">
+                        <div
+                            class="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-700">
+                            <span class="text-gray-500 dark:text-gray-400">{{ langService.translate('events.date')
+                                }}</span>
+                            <span class="font-bold text-gray-900 dark:text-white">{{ selectedShow()!.start_time |
+                                date:'fullDate'
+                                }}</span>
+                        </div>
+                        <div
+                            class="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-700">
+                            <span class="text-gray-500 dark:text-gray-400">{{ langService.translate('events.time')
+                                }}</span>
+                            <span class="font-bold text-gray-900 dark:text-white">{{ selectedShow()!.start_time |
+                                date:'shortTime'
+                                }}</span>
+                        </div>
+                        <div
+                            class="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-700">
+                            <span class="text-gray-500 dark:text-gray-400">{{ langService.translate('events.price')
+                                }}</span>
+                            <span class="font-bold text-2xl text-primary-600 dark:text-primary-400">{{
+                                selectedShow()!.price | currency }}</span>
+                        </div>
+
+                        <div class="pt-4">
+                            <button (click)="proceedToBooking()"
+                                class="w-full py-4 btn-primary rounded-xl font-bold text-lg hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0">
+                                {{ langService.translate('events.select_seats') }} →
+                            </button>
+                            <p class="text-center text-xs text-gray-400 mt-3">
+                                {{ langService.translate('events.power_by') }}
+                            </p>
+                        </div>
+                    </div>
+                    } @else {
+                    <div class="text-center py-8">
+                        <div
+                            class="w-16 h-16 bg-primary-50 dark:bg-primary-900/10 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl text-primary-600 dark:text-primary-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                            </svg>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 font-medium">{{
+                            langService.translate('events.showtime_guide') }}</p>
+                    </div>
+                    }
+                    }
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+} @else {
+<div class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-dark-bg">
+    <div class="text-center">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ langService.translate('events.not_found')
+            }}</h2>
+        <div
+            class="p-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-lg mb-6 text-left max-w-md mx-auto font-mono text-sm">
+            <p><strong>Error:</strong> The requested event could not be found in the database.</p>
+            <p class="mt-2"><strong>Requested ID:</strong> {{ router.url.split('/').pop() }}</p>
+            <p class="mt-2 text-xs">If you clicked this from a list, the list might be outdated.</p>
+        </div>
+        <a routerLink="/events" class="px-6 py-3 btn-primary text-white rounded-lg hover:bg-primary-700 transition">
+            {{ langService.translate('events.back_to_list') }}
+        </a>
+    </div>
+</div>
+}

@@ -1,0 +1,42 @@
+[
+  {
+    "train_number": "3015",
+    "train_type": "AC Russian",
+    "departure_time": "4:50 AM",
+    "arrival_time": "9:00 AM",
+    "duration": "04:10",
+    "stops": 7
+  },
+  {
+    "train_number": "945",
+    "train_type": "AC Russian",
+    "departure_time": "6:10 AM",
+    "arrival_time": "10:30 AM",
+    "duration": "04:20",
+    "stops": 9
+  },
+  {
+    "train_number": "185",
+    "train_type": "AC Russian",
+    "departure_time": "9:10 AM",
+    "arrival_time": "1:05 PM",
+    "duration": "03:55",
+    "stops": 9
+  },
+  {
+    "train_number": "951",
+    "train_type": "Russian",
+    "departure_time": "11:30 AM",
+    "arrival_time": "4:05 PM",
+    "duration": "04:35",
+    "stops": 15
+  },
+  {
+    "train_number": "955",
+    "train_type": "AC Russian",
+    "departure_time": "2:40 PM",
+    "arrival_time": "7:05 PM",
+    "duration": "04:25",
+    "stops": 13
+  }
+]

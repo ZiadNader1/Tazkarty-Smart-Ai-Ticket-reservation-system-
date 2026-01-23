@@ -1,0 +1,96 @@
+// =====================================================
+// FILE: src/app/features/admin/components/show-management/show-management.scss
+// Show Management Styles
+// =====================================================
+
+:host {
+  display: block;
+}
+
+// Table Row Hover
+tbody tr {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &:hover {
+    transform: translateX(8px);
+    box-shadow: -4px 0 0 0 rgba(147, 51, 234, 0.5);
+  }
+}
+
+// Status Indicator Animation
+.status-indicator {
+  animation: pulse-indicator 2s ease-in-out infinite;
+}
+
+@keyframes pulse-indicator {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+// Action Buttons
+.action-btn {
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: scale(1.1) rotate(5deg);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+// Gradient Background Animation
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.gradient-bg {
+  background: linear-gradient(270deg, #9333ea, #ec4899, #9333ea);
+  background-size: 200% 200%;
+  animation: gradient-shift 5s ease infinite;
+}
+
+// Card Shine Effect
+.card-shine {
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      45deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent
+    );
+    transform: rotate(45deg);
+    animation: shine 3s infinite;
+  }
+}
+
+@keyframes shine {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+  }
+}

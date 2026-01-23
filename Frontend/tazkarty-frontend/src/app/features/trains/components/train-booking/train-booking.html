@@ -1,0 +1,189 @@
+<div class="min-h-screen bg-slate-950 text-white pt-24 pb-12 px-4 md:px-8">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- Left: Seat Map & Train Info -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Train Info Header -->
+            <div class="bg-slate-900/50 border border-slate-800 rounded-2xl p-6 backdrop-blur-md">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h1 class="text-3xl font-bold text-blue-400">{{ langService.translate('nav.trains') }} #{{
+                            trainNumber() }}</h1>
+                        <p class="text-slate-400 mt-1">{{ langService.translate(departureCity()) }} → {{
+                            langService.translate(destinationCity()) }} | {{ langService.translate(trainType())
+                            }}</p>
+                    </div>
+                    <div class="text-right">
+                        <label class="block text-xs text-slate-500 uppercase font-semibold mb-1">{{
+                            langService.translate('trains.travel_date') }}</label>
+                        <input type="date" [ngModel]="selectedDate()"
+                            (ngModelChange)="selectedDate.set($event); onDateChange()"
+                            class="bg-slate-800 border-none rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 [color-scheme:dark]">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carriage Selector -->
+            <div class="flex gap-2 overflow-x-auto pb-4 custom-scroll">
+                @for (carriage of availability()?.layout; track carriage.number; let i = $index) {
+                <button (click)="selectCarriage(i)"
+                    [class]="'flex-shrink-0 px-6 py-4 rounded-xl border transition-all duration-300 ' + 
+                                (selectedCarriageIndex() === i ? 'bg-blue-600 border-blue-400 shadow-lg shadow-blue-900/40' : 'bg-slate-900 border-slate-800 hover:border-slate-700')">
+                    <div class="text-xs font-semibold uppercase opacity-60">{{ langService.translate('trains.carriage')
+                        }}</div>
+                    <div class="text-xl font-bold">{{ carriage.number }}</div>
+                    <div class="text-[10px] opacity-80 mt-1">{{ langService.translate(carriage.class) }}</div>
+                </button>
+                }
+            </div>
+
+            <!-- Seat Selection Area -->
+            @if (loading()) {
+            <div class="flex flex-col items-center justify-center py-20">
+                <div class="w-12 h-12 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
+                <p class="mt-4 text-slate-400">{{ langService.translate('trains.sync_station') }}</p>
+            </div>
+            } @else if (availability()) {
+            @let currentCar = availability()!.layout[selectedCarriageIndex()];
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 relative overflow-hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-xl font-semibold">{{ langService.translate('trains.carriage') }} {{
+                        currentCar.number }} {{ langService.translate('trains.layout') }}</h2>
+                    <div class="flex gap-4 text-xs">
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 bg-slate-700 rounded-sm"></div> {{
+                            langService.translate('booking.available') }}
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 bg-red-600 rounded-sm"></div> {{
+                            langService.translate('booking.occupied') }}
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 bg-blue-500 rounded-sm"></div> {{
+                            langService.translate('booking.selected') }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Train Carriage Visual -->
+                <div class="relative bg-slate-800/20 p-6 rounded-3xl border-x-4 border-slate-700">
+                    <div class="grid gap-y-4 max-w-md mx-auto">
+                        @for (row of [].constructor(currentCar.rows); track rIdx; let rIdx = $index) {
+                        <div class="grid grid-cols-4 gap-4 items-center">
+                            <div class="text-[10px] text-slate-600 font-mono">{{ rIdx + 1 }}</div>
+
+                            <!-- Seats side by side -->
+                            <div class="flex gap-2 justify-center">
+                                @for (col of [0, 1]; track cIdx; let cIdx = $index) {
+                                @let label = getSeatLabel(rIdx, col);
+                                <button (click)="toggleSeat(currentCar, rIdx, col)"
+                                    [disabled]="isSeatOccupied(currentCar.number, label)"
+                                    [class]="'w-10 h-10 rounded-md text-[10px] font-bold transition-all ' + 
+                                                        (isSeatOccupied(currentCar.number, label) ? 'bg-red-900/40 text-red-400 cursor-not-allowed border border-red-800' : 
+                                                         isSeatSelected(currentCar.number, label) ? 'bg-blue-500 text-white border border-blue-300 shadow-md shadow-blue-500/50' : 
+                                                         'bg-slate-700 hover:bg-slate-600 text-slate-300 border border-slate-600')">
+                                    {{ label }}
+                                </button>
+                                }
+                            </div>
+
+                            <!-- Aisle -->
+                            <div class="w-8 border-x border-slate-700/30 h-full flex items-center justify-center">
+                                <div class="w-[1px] h-full bg-slate-800"></div>
+                            </div>
+
+                            <div class="flex gap-2 justify-center">
+                                @for (col of [2, 3]; track cIdx; let cIdx = $index) {
+                                @let label = getSeatLabel(rIdx, col);
+                                <button (click)="toggleSeat(currentCar, rIdx, col)"
+                                    [disabled]="isSeatOccupied(currentCar.number, label)"
+                                    [class]="'w-10 h-10 rounded-md text-[10px] font-bold transition-all ' + 
+                                                        (isSeatOccupied(currentCar.number, label) ? 'bg-red-900/40 text-red-400 cursor-not-allowed border border-red-800' : 
+                                                         isSeatSelected(currentCar.number, label) ? 'bg-blue-500 text-white border border-blue-300 shadow-md shadow-blue-500/50' : 
+                                                         'bg-slate-700 hover:bg-slate-600 text-slate-300 border border-slate-600')">
+                                    {{ label }}
+                                </button>
+                                }
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            }
+        </div>
+
+        <!-- Right: Booking Details -->
+        <div class="space-y-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sticky top-24">
+                <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+                    <span class="w-2 h-6 bg-blue-500 rounded-full"></span>
+                    {{ langService.translate('trains.res_summary') }}
+                </h2>
+
+                <!-- User Data -->
+                <div class="space-y-4 mb-8">
+                    <div>
+                        <label class="block text-xs text-slate-500 uppercase mb-1">{{
+                            langService.translate('contact.name_label') }}</label>
+                        <input type="text" [(ngModel)]="userName"
+                            class="w-full bg-slate-800 border-none rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-500 uppercase mb-1">{{
+                            langService.translate('trains.national_id') }}</label>
+                        <input type="text" [(ngModel)]="nationalId"
+                            [placeholder]="langService.translate('trains.id_placeholder')"
+                            class="w-full bg-slate-800 border-none rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-500 uppercase mb-1">{{
+                            langService.translate('contact.phone_label') }}</label>
+                        <input type="text" [(ngModel)]="phoneNumber"
+                            class="w-full bg-slate-800 border-none rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+
+                <!-- Selected Seats List -->
+                <div class="border-t border-slate-800 pt-6 space-y-3">
+                    @if (selectedSeats().length === 0) {
+                    <p class="text-center text-slate-500 text-sm py-4 italic">{{
+                        langService.translate('booking.no_seats_selected') }}</p>
+                    } @else {
+                    @for (seat of selectedSeats(); track seat.seat) {
+                    <div
+                        class="flex justify-between items-center bg-slate-800/50 p-3 rounded-lg border border-slate-700/50 animate-fade-in">
+                        <div>
+                            <div class="text-sm font-bold">{{ langService.translate('trains.carriage') | titlecase }} {{
+                                seat.carriage }} - {{ langService.translate('trains.seat') }} {{ seat.seat }}</div>
+                            <div class="text-[10px] text-slate-400">{{ langService.translate(seat.class) }}</div>
+                        </div>
+                        <div class="text-blue-400 font-bold">{{ seat.price }} {{ langService.translate('common.egp') }}
+                        </div>
+                    </div>
+                    }
+                    }
+                </div>
+
+                <!-- Total -->
+                <div class="border-t border-slate-800 mt-6 pt-6 flex justify-between items-end">
+                    <div>
+                        <div class="text-slate-500 text-xs uppercase font-semibold">{{
+                            langService.translate('trains.total_amount') }}</div>
+                        <div class="text-3xl font-black text-white">{{ totalPrice() }} <span
+                                class="text-sm font-normal">{{ langService.translate('common.egp') }}</span></div>
+                    </div>
+                    <button (click)="confirmBooking()" [disabled]="selectedSeats().length === 0 || loading()"
+                        class="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg shadow-blue-900/20 active:scale-95">
+                        {{ loading() ? langService.translate('trains.confirming') :
+                        langService.translate('trains.book_now') }}
+                    </button>
+                </div>
+
+                <p class="text-[10px] text-slate-500 mt-4 leading-tight">
+                    {{ langService.translate('trains.terms_footnote') }}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

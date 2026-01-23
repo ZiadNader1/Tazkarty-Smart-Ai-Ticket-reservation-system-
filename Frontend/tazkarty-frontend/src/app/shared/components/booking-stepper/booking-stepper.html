@@ -1,0 +1,58 @@
+<div class="max-w-3xl mx-auto mb-12">
+    <div class="relative">
+        <!-- Progress Bar Background -->
+        <div class="absolute top-1/2 left-0 w-full h-1 bg-gray-200 -z-10 rounded-full"></div>
+
+        <!-- Progress Bar Fill -->
+        <div class="absolute top-1/2 left-0 h-1 bg-primary-600 -z-10 rounded-full transition-all duration-500 ease-out"
+            [style.width]="getProgressWidth()"></div>
+
+        <div class="flex justify-between w-full">
+            <!-- Step 1: Ticket Overview -->
+            <div class="flex flex-col items-center gap-2 cursor-pointer"
+                (click)="canNavigateTo(1) && onStepClick.emit(1)">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-lg ring-4 ring-white transition-all duration-300 transform"
+                    [class.bg-primary-600]="currentStep >= 1" [class.text-white]="currentStep >= 1"
+                    [class.bg-white]="currentStep < 1" [class.text-gray-400]="currentStep < 1"
+                    [class.border-2]="currentStep < 1" [class.scale-110]="currentStep === 1">
+                    @if (currentStep > 1) { ✓ } @else { 1 }
+                </div>
+                <span class="text-xs font-bold uppercase tracking-wide mt-1 transition-colors duration-300"
+                    [class.text-primary-700]="currentStep >= 1" [class.text-gray-400]="currentStep < 1">
+                    {{ langService.translate('stepper.select_seats') }}
+                </span>
+            </div>
+
+            <!-- Step 2: Payment -->
+            <div class="flex flex-col items-center gap-2 cursor-pointer"
+                (click)="canNavigateTo(2) && onStepClick.emit(2)">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-lg ring-4 ring-white transition-all duration-300 transform"
+                    [class.bg-primary-600]="currentStep >= 2" [class.text-white]="currentStep >= 2"
+                    [class.bg-white]="currentStep < 2" [class.text-gray-400]="currentStep < 2"
+                    [class.border-2]="currentStep < 2" [class.border-gray-200]="currentStep < 2"
+                    [class.scale-110]="currentStep === 2">
+                    @if (currentStep > 2) { ✓ } @else { 2 }
+                </div>
+                <span class="text-xs font-bold uppercase tracking-wide mt-1 transition-colors duration-300"
+                    [class.text-primary-700]="currentStep >= 2" [class.text-gray-400]="currentStep < 2">
+                    {{ langService.translate('stepper.checkout') }}
+                </span>
+            </div>
+
+            <!-- Step 3: Confirmation -->
+            <div class="flex flex-col items-center gap-2">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-lg ring-4 ring-white transition-all duration-300 transform"
+                    [class.bg-primary-600]="currentStep >= 3" [class.text-white]="currentStep >= 3"
+                    [class.bg-white]="currentStep < 3" [class.text-gray-400]="currentStep < 3"
+                    [class.border-2]="currentStep < 3" [class.border-gray-200]="currentStep < 3"
+                    [class.scale-110]="currentStep === 3">
+                    3
+                </div>
+                <span class="text-xs font-bold uppercase tracking-wide mt-1 transition-colors duration-300"
+                    [class.text-primary-700]="currentStep >= 3" [class.text-gray-400]="currentStep < 3">
+                    {{ langService.translate('stepper.confirmation') }}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
