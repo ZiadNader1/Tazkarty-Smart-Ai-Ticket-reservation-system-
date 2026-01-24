@@ -109,16 +109,18 @@ tazkarty/
 
 ---
 
-## 🏗️ System Architecture & Flow
+## 🏗️ System Architecture & Complete Flow
 
-To ensure a robust and scalable experience, Tazkarty follows a modern asynchronous architecture. Below is the **Sequence Diagram** representing the core journey from discovery to payment:
+To ensure a robust and scalable experience, Tazkarty follows a modern asynchronous architecture. Below is the **Full Sequence Diagram** representing the entire user journey and system interactions (Auth, AI, Sockets, and Payments):
 
-![Architecture Diagram](screenshots/architecture_diagram.png)
+![Full Sequence Diagram](screenshots/full_sequence_diagram.png)
 
-### Architectural Highlights:
-- **Real-time Synchronization:** Uses WebSockets (Socket.IO) to broadcast seat locks across all clients instantly, preventing double-bookings.
-- **AI-Powered Discovery:** Integrates Google Gemini API for natural language event search and intelligent support.
-- **Secure Transaction Lifecycle:** Implements Stripe's Payment Intent API with Webhook verification for guaranteed data integrity.
+### 🚀 Key Technical Flows:
+- **Authentication:** Secure JWT-based entry for Users and Admins.
+- **AI Chatbot (Nada):** Integrating Google Gemini API for intelligent event discovery and support.
+- **Real-time Engine:** Utilizing WebSockets (Socket.IO) for instant seat-locking globally.
+- **Financial Gateway:** Full Stripe API lifecycle management with secure webhook verification.
+- **Admin Management:** Comprehensive dashboard for stadium and event orchestration.
 
 ---
 
