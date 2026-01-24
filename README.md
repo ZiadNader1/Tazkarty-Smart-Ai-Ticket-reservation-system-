@@ -149,22 +149,6 @@ To ensure a seamless user experience, Tazkarty implements a highly structured **
 
 ---
 
-## 📊 Database Design (ERD - Chen's Notation)
-
-Tazkarty's data model is documented below. This Diagram illustrates the Entities (Rectangles), their Attributes (Ovals), and the logical Relationships (Diamonds) between them:
-
-![ERD Diagram](screenshots/erd_diagram_classic.png)
-
-### 🔑 Logical Schema Breakdown:
-- **Entities & Attributes:** Every core component (User, Event, Ticket, Seat) is defined with its essential properties for high data integrity.
-- **Relationships (The Diamonds):** 
-    - **User <Owns> Ticket:** A 1:N relationship tracking booking ownership.
-    - **Event <Has> Show:** 1:N mapping of specific timings to an event category.
-    - **Ticket <Reserved> Seat:** Managing the link between a successful payment and physical inventory.
-- **Data Integrity:** The schema ensures that seats cannot be booked without a valid ticket and a linked user account.
-
----
-
 ## 🛡️ End-to-End Sequence
 
 The following **Sequence Diagram** represents the end-to-end journey from user discovery to ticket generation:
