@@ -91,8 +91,9 @@ export class ChatInterfaceComponent implements OnInit, AfterViewChecked {
   }
 
   addUserMessage(text: string): void {
+    const id = `user-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
     this.messages.update(msgs => [...msgs, {
-      id: Date.now().toString(),
+      id,
       text,
       sender: 'user',
       timestamp: new Date()
@@ -101,8 +102,9 @@ export class ChatInterfaceComponent implements OnInit, AfterViewChecked {
   }
 
   addAIMessage(text: string): void {
+    const id = `ai-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
     this.messages.update(msgs => [...msgs, {
-      id: Date.now().toString(),
+      id,
       text,
       sender: 'ai',
       timestamp: new Date()
@@ -184,7 +186,7 @@ export class ChatInterfaceComponent implements OnInit, AfterViewChecked {
   private sendToBackend(sessionId: string, question: string): void {
     // Add typing indicator
     this.isTyping.set(true);
-    const typingId = Date.now().toString();
+    const typingId = `typing-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
     this.messages.update(msgs => [...msgs, {
       id: typingId,
       text: '',
@@ -238,7 +240,7 @@ export class ChatInterfaceComponent implements OnInit, AfterViewChecked {
     this.aiService.getConversation(sessionId).subscribe({
       next: (msgs) => {
         const mapped: Message[] = (msgs || []).map((m: any, index: number) => ({
-          id: `${index}-${m.time || Date.now()}`,
+          id: `msg-${index}-${m.time || Date.now()}-${Math.floor(Math.random() * 1000)}`,
           text: m.text,
           sender: m.sender,
           timestamp: new Date(m.time || new Date())

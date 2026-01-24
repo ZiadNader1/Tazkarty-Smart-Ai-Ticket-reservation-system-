@@ -12,27 +12,26 @@ const userSockets = new Map();
 export const initializeSocket = (server) => {
   io = new Server(server, {
     cors: {
-      origin: process.env.SOCKET_CORS_ORIGIN || 'http://localhost:3000',
-      methods: ['GET', 'POST'],
+      origin: ["http://localhost:4200", "http://localhost:3000"],
+      methods: ["GET", "POST"],
       credentials: true
     }
   });
 
-  // Authentication Middleware
+  // Authentication Middleware (Optional for connections)
   io.use((socket, next) => {
     try {
-      const token = socket.handshake.auth.token;
+      const token = socket.handshake.auth?.token;
 
-      if (!token) {
-        return next(new Error('Authentication token missing'));
+      if (token) {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        socket.userId = decoded.id;
       }
-
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      socket.userId = decoded.id;
       next();
     } catch (error) {
-      console.error('Socket Auth Error:', error);
-      next(new Error('Invalid authentication token'));
+      console.warn('Socket Auth Warning (Continuing as guest):', error.message);
+      // We still call next() because we want to allow guests to connect
+      next();
     }
   });
 
@@ -40,17 +39,21 @@ export const initializeSocket = (server) => {
   io.on('connection', (socket) => {
     const userId = socket.userId;
 
-
-    // Store user's socket
-    userSockets.set(userId.toString(), socket.id);
-
-    // Join user's personal room
-    socket.join(`user:${userId}`);
+    if (userId) {
+      // Store user's socket
+      userSockets.set(userId.toString(), socket.id);
+      // Join user's personal room
+      socket.join(`user:${userId}`);
+    } else {
+      // Join anonymous room if needed
+      socket.join('anonymous');
+    }
 
     // Handle disconnection
     socket.on('disconnect', () => {
-
-      userSockets.delete(userId.toString());
+      if (userId) {
+        userSockets.delete(userId.toString());
+      }
     });
 
     // Custom events

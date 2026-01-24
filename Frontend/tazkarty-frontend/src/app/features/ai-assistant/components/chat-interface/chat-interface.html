@@ -27,7 +27,7 @@
                 {{ langService.translate('ai.quick_questions') }}
             </h3>
 
-            @for (suggestion of quickSuggestions(); track suggestion) {
+            @for (suggestion of quickSuggestions(); track $index) {
             <button (click)="sendQuickMessage(suggestion)"
                 class="w-full text-left p-3 bg-gray-50 dark:bg-gray-900/50 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-xl transition-all text-sm text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 border border-transparent hover:border-primary-100 dark:hover:border-primary-900/30 mb-1 group flex items-center gap-2">
                 <div
@@ -109,7 +109,7 @@
                     {{ langService.translate('ai.meet_nada_desc') }}
                 </p>
                 <div class="flex flex-wrap justify-center gap-3 max-w-2xl mx-auto">
-                    @for (example of exampleQuestions(); track example) {
+                    @for (example of exampleQuestions(); track $index) {
                     <button (click)="sendQuickMessage(example)"
                         class="px-5 py-2.5 bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-800 rounded-full shadow-md hover:border-primary-500 transition-all text-sm text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-white">
                         {{ example }}

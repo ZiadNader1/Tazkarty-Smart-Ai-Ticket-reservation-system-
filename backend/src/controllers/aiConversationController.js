@@ -1,6 +1,17 @@
 import AiConversation from "../models/AiConversation.js";
 import { generateAIResponse } from "../services/aiService.js";
 import { v4 as uuidv4 } from "uuid";
+import fs from "fs/promises";
+import path from "path";
+import { fileURLToPath } from 'url';
+import Show from "../models/Show.js";
+import Event from "../models/Event.js";
+import Venue from "../models/Venue.js";
+import Stadium from "../models/Stadium.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 
 /**
  * Create new AI chat session
@@ -54,36 +65,137 @@ export const addMessage = async (req, res) => {
 
     conversation.messages.push(userMessage);
 
-    // Fetch concise event context for AI
-    const upcomingShows = await import("../models/Show.js").then(m => m.default.find({
-      is_active: true,
+    // Fetch comprehensive event context for AI
+    // 1. Get upcoming shows
+    let upcomingShows = await Show.find({
       start_time: { $gte: new Date() }
-    }).populate("event_id").limit(10).select("title start_time price event_id")); // populate event details
+    })
+      .populate({
+        path: 'event_id',
+        populate: [
+          { path: 'venue_id', select: 'name address' },
+          { path: 'stadium_id', select: 'name city' }
+        ]
+      })
+      .limit(10)
+      .lean();
 
-    // Format context
-    const eventContext = upcomingShows.map((s, idx) => {
+    // 2. Also get general upcoming events (especially sports) that might not have a "Show" yet
+    const upcomingEvents = await Event.find({
+      release_date: { $gte: new Date() }
+    })
+      .populate('stadium_id', 'name city')
+      .populate('venue_id', 'name address')
+      .limit(10)
+      .lean();
+
+    // Combine and format
+    let eventEntries = [];
+
+    // Format Shows
+    upcomingShows.forEach((s, idx) => {
       const evt = s.event_id || {};
-      return `${idx + 1}. ${evt.title || s.title} (${evt.type || 'Event'}) - ${new Date(s.start_time).toLocaleString('en-EG')} - Price: ${s.price} EGP`;
-    }).join("\n");
+      let title = evt.title || s.title || 'Event';
+      if (evt.type === 'sports' && evt.home_team && evt.away_team) {
+        title = `MATCH: ${evt.home_team} vs ${evt.away_team} (${evt.championship_type || 'Tournament'})`;
+      }
+      const venue = evt.stadium_id?.name || evt.venue_id?.name || s.hall_id?.name || "Official Venue";
+      const time = new Date(s.start_time).toLocaleString('en-EG', { dateStyle: 'medium', timeStyle: 'short' });
+      eventEntries.push(`${title} - Venue: ${venue} - Time: ${time} - Price: ${s.price} EGP`);
+    });
 
-    // Add Train Context
-    const trainDestinations = ["Alexandria", "Aswan", "Asyuit", "Luxor", "PortSaid"];
-    const trainContext = `Train Services:
-- Destinations from Cairo: ${trainDestinations.join(", ")}.
-- Booking Process: Users can search for trains, view detailed carriage layouts, and select specific seats.
-- Carriage Types: We offer different carriage classes (First Class, Second Class, VIP).
-- Requirements: National ID is mandatory for all train bookings in Egypt.
-- Tickets: Digital tickets with QR codes are issued upon successful payment.
-- Guidance: Tell users to visit the 'Trains' section for live schedules and real-time availability.`;
+    // Format Events (avoid duplicates if already in shows)
+    upcomingEvents.forEach(evt => {
+      const alreadyAdded = upcomingShows.some(s => s.event_id?._id?.toString() === evt._id.toString());
+      if (!alreadyAdded) {
+        let title = evt.title || 'Upcoming Event';
+        if (evt.type === 'sports' && evt.home_team && evt.away_team) {
+          title = `MATCH: ${evt.home_team} vs ${evt.away_team} (${evt.championship_type || 'Upcoming'})`;
+        }
+        const venue = evt.stadium_id?.name || evt.venue_id?.name || "TBA";
+        const time = new Date(evt.release_date).toLocaleString('en-EG', { dateStyle: 'medium', timeStyle: 'short' });
+        eventEntries.push(`${title} - Venue: ${venue} - Date: ${time} (Check site for showtimes)`);
+      }
+    });
 
-    const systemContext = `Current Website Events:\n${eventContext}\n\n${trainContext}\n\n`;
+    const eventContext = eventEntries.length > 0
+      ? eventEntries.map((entry, i) => `${i + 1}. ${entry}`).join("\n")
+      : "No upcoming events or matches found in the database. Tell users to check again soon!";
+
+    // Add Train Context (Dynamic & Bilingual)
+    const trainDestinations = [
+      { id: "Alexandria", keywords: ["alexandria", "alex", "اسكندرية", "الإسكندرية", "إسكندرية"] },
+      { id: "Aswan", keywords: ["aswan", "أسوان", "اسوان"] },
+      { id: "Asyuit", keywords: ["asyuit", "أسيوط", "اسيوط"] },
+      { id: "Luxor", keywords: ["luxor", "الأقصر", "الاقصر"] },
+      { id: "PortSaid", keywords: ["portsaid", "بورسعيد", "بور سعيد"] }
+    ];
+
+    const trainKeywords = ["train", "قطار", "قطارات", "القطار"];
+    let trainContext = `Available Destinations from Cairo: Alexandria, Aswan, Asyuit, Luxor, PortSaid.`;
+
+    // Proactively fetch train schedules if user asks about trains or a destination
+    const lowerText = text.toLowerCase();
+
+    // Check current message for destination
+    let matchedDest = trainDestinations.find(d =>
+      d.keywords.some(k => lowerText.includes(k.toLowerCase()))
+    );
+
+    // If not found in current message, look back at last 2-3 messages in history
+    if (!matchedDest && conversation.messages.length > 0) {
+      for (const msg of conversation.messages.slice(-3).reverse()) {
+        const historyLower = msg.text.toLowerCase();
+        matchedDest = trainDestinations.find(d =>
+          d.keywords.some(k => historyLower.includes(k.toLowerCase()))
+        );
+        if (matchedDest) break;
+      }
+    }
+
+    const isAskingAboutTrains = trainKeywords.some(k => lowerText.includes(k)) || matchedDest;
+
+    if (isAskingAboutTrains) {
+      try {
+        const targetDest = matchedDest ? matchedDest.id : "Alexandria"; // Default to Alex if just 'train'
+        const trainFileName = `cairo_to_${targetDest.toLowerCase()}.json`;
+        const trainPath = path.join(__dirname, '../../uploads', trainFileName);
+        const trainData = JSON.parse(await fs.readFile(trainPath, 'utf8'));
+
+        // Give AI a slice of schedules (up to 20 trains for better coverage)
+        const scheduleSlice = trainData.slice(0, 20).map(t =>
+          `Train #${t.train_number} (${t.train_type}): Departs ${t.departure_time}, Arrives ${t.arrival_time}`
+        ).join("\n");
+
+        trainContext = `REAL-TIME SCHEDULES FOR CAIRO TO ${targetDest.toUpperCase()}:\n${scheduleSlice}\n(Note: If the user didn't specify a destination, I showed Alexandria as an example. Tell them to specify their destination!)`;
+      } catch (err) {
+        console.warn("Could not load train schedules for AI context:", err.message);
+      }
+    }
+
+    const systemContext = `
+    ### NADA'S OPERATIONAL PROTOCOL ###
+    1. IDENTITY: You are "Nada", a proud member of the Tazkarty Team.
+    2. LOYALTY: NEVER ever say "book from other websites" or "go to the station". Everything is available HERE on Tazkarty.
+    3. GUIDANCE: If a user asks how to book, say: "You can book directly by clicking on 'Trains' or 'Events' in the menu above!"
+    4. DATA SUPREMACY: Use ONLY the Provided Data. If a train is in the list, it is current and bookable on Tazkarty.
+    5. SALES FOCUS: If they like a train or event, say: "That's a great choice! Should I help you pick your seat on Tazkarty now?"
+    
+    ### PROVIDED DATA ###
+    - EVENTS & MATCHES:
+    ${eventContext}
+    
+    - TRAIN SCHEDULES:
+    ${trainContext}
+    `;
+
 
     // Generate AI response
     const aiResponseText = await generateAIResponse(
       text,
       conversation.messages,
       systemContext,
-      lang // Pass lang as fourth arg
+      lang
     );
 
     // Add AI message

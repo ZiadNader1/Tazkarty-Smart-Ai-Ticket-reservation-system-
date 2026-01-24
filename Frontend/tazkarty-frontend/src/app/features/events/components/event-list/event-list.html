@@ -3,7 +3,7 @@
     @if (isSportsView) {
     <section class="relative h-[60vh] overflow-hidden">
         <video #sportsVideo autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover"
-            (loadeddata)="sportsVideo.play()" poster="/1709541695Egypt_Cup_Zamalek_Ahly_1280_x_1280 (1).png">
+            (loadeddata)="sportsVideo.play()">
             <source src="/football.mp4" type="video/mp4">
         </video>
         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
@@ -165,7 +165,7 @@
                     {{ totalResults }} {{ langService.translate('events.events_found') }}
                 </h2>
                 <div class="flex gap-2 text-sm mt-1">
-                    @for (tag of activeTags; track tag) {
+                    @for (tag of activeTags; track $index) {
                     <span
                         class="bg-primary-500/10 text-primary-400 px-3 py-1 rounded-full border border-primary-500/20 flex items-center gap-2 text-xs font-medium">
                         {{ tag }}
