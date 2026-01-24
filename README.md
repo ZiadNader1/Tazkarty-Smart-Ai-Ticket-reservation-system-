@@ -109,9 +109,36 @@ tazkarty/
 
 ---
 
-## 🏗️ System Architecture & Complete Flow
+## 🏗️ System Architecture & Engineering Design
 
-To ensure a robust and scalable experience, Tazkarty follows a modern asynchronous architecture. Below is the **Full Sequence Diagram** representing the entire user journey and system interactions (Auth, AI, Sockets, and Payments):
+Tazkarty is built using a layered **Micro-services inspired Architecture** that ensures separation of concerns, scalability, and real-time performance. Below is the **System Component Diagram** illustrating the interaction between various layers:
+
+![System Architecture Diagram](screenshots/system_architecture_diagram.png)
+
+### 🧱 Architectural Layers:
+
+1.  **Client Layer (Angular 19):**
+    *   **Auth Module:** Manages secure JWT-based sessions.
+    *   **Booking Engine:** Handles complex seat selection and logic.
+    *   **AI Interface:** Modern chat UI for real-time interaction with Nada AI.
+    *   **Admin Dashboard:** Comprehensive orchestration for data management.
+
+2.  **Logic Layer (Node.js & Express):**
+    *   **RESTful Controllers:** Secure API endpoints for all CRUD operations.
+    *   **Socket.IO Manager:** Real-time event emitter for instant seat synchronization.
+    *   **Service Layer:** Dedicated services for Gemini AI integration and Stripe payment lifecycle.
+
+3.  **Infrastructure & External Services:**
+    *   **Database:** MongoDB Atlas for high-availability data storage.
+    *   **AI:** Google Gemini API for Natural Language Processing.
+    *   **Payments:** Stripe API for secure financial transactions.
+    *   **Hosting:** Netlify (Frontend) & Render (Backend) with CI/CD integration.
+
+---
+
+## 🔄 Core System Flow
+
+The following **Sequence Diagram** represents the end-to-end journey from user discovery to ticket generation:
 
 ![Full Sequence Diagram](screenshots/full_sequence_diagram.png)
 
