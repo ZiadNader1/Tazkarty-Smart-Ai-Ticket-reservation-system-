@@ -58,8 +58,8 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20"
         [class.-mt-16]="!isSportsView && !isEntertainmentView" [class.-mt-32]="isSportsView || isEntertainmentView">
 
-        <!-- Filters (Sticky Desktop) -->
-        <div class="mb-8 sticky top-[74px] z-40">
+        <!-- Filters (Sticky Desktop Only) -->
+        <div class="mb-8 md:sticky top-[74px] z-40">
             @if (!isSportsView) {
             <app-event-filters (filterChange)="onFilterChange($event)"></app-event-filters>
             } @else {

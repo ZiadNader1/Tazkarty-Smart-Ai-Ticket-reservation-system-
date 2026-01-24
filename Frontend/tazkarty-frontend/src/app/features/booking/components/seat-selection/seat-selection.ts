@@ -433,11 +433,12 @@ export class SeatSelection implements OnInit, OnDestroy {
   }
 
   getImageUrl(imagePath: string | undefined): string {
-    if (!imagePath) return ''; // Return empty to let caller handle fallback
-    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-      return imagePath;
-    }
-    return `${environment.socketUrl}/${imagePath}`;
+    if (!imagePath) return '';
+    if (imagePath.startsWith('http')) return imagePath;
+
+    // Fix paths like uploads/image.png
+    const cleanPath = imagePath.startsWith('uploads/') ? imagePath.replace('uploads/', '') : imagePath;
+    return `${environment.uploadsUrl}/${cleanPath.replace(/\\/g, '/')}`;
   }
 
   getDisplayLayoutImage(): string {

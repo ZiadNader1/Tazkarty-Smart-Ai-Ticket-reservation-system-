@@ -14,9 +14,20 @@ import { LanguageService } from '../../../core/services/language.service';
     <nav class="bg-dark-card border-b border-gray-800 shadow-sm sticky top-0 z-50 transition-colors duration-300">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
-          <!-- Logo -->
+          <!-- Logo & Mobile Menu Toggle -->
           <div class="flex items-center">
-            <a routerLink="/" class="flex items-center space-x-2 rtl:space-x-reverse">
+            <!-- Hamburger Button (Mobile) -->
+            <button (click)="toggleMobileMenu()" class="md:hidden p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 focus:outline-none mr-2 rtl:mr-0 rtl:ml-2">
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                @if (!showMobileMenu()) {
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                } @else {
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                }
+              </svg>
+            </button>
+
+            <a routerLink="/" (click)="showMobileMenu.set(false)" class="flex items-center space-x-2 rtl:space-x-reverse">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
               </svg>
@@ -24,7 +35,7 @@ import { LanguageService } from '../../../core/services/language.service';
             </a>
           </div>
 
-          <!-- Navigation Links -->
+          <!-- Desktop Navigation Links -->
           <div class="hidden md:flex items-center space-x-6 rtl:space-x-reverse text-sm font-medium">
             <a routerLink="/" routerLinkActive="text-primary-500" [routerLinkActiveOptions]="{exact: true}"
                class="text-gray-300 hover:text-primary-400 transition">
@@ -42,7 +53,6 @@ import { LanguageService } from '../../../core/services/language.service';
                class="text-gray-300 hover:text-primary-400 transition">
               {{ langService.translate('nav.trains') }}
             </a>
-
             <a routerLink="/stores" routerLinkActive="text-primary-500"
                class="text-gray-300 hover:text-primary-400 transition">
               {{ langService.translate('nav.stores') }}
@@ -51,12 +61,10 @@ import { LanguageService } from '../../../core/services/language.service';
                class="text-gray-300 hover:text-primary-400 transition">
               {{ langService.translate('nav.faq') }}
             </a>
-           
             <a routerLink="/contact" routerLinkActive="text-primary-500"
                class="text-gray-300 hover:text-primary-400 transition">
               {{ langService.translate('nav.contact') }}
             </a>
-
             @if (authService.isAuthenticated()) {
               <a routerLink="/ai-assistant" routerLinkActive="text-primary-500"
                  class="text-gray-300 hover:text-primary-400 transition">
@@ -65,7 +73,7 @@ import { LanguageService } from '../../../core/services/language.service';
             }
           </div>
 
-          <!-- Right Side -->
+          <!-- Right Side Tools -->
           <div class="flex items-center space-x-3 rtl:space-x-reverse">
             <!-- Language Toggle Button -->
             <button (click)="langService.toggleLanguage()" 
@@ -103,18 +111,18 @@ import { LanguageService } from '../../../core/services/language.service';
                   <span class="hidden md:block text-sm font-medium text-gray-200">{{ userName() }}</span>
                 </button>
 
-                <!-- User Dropdown -->
+                <!-- User Dropdown (Desktop) -->
                 @if (showUserMenu()) {
                   <div class="absolute right-0 rtl:left-0 rtl:right-auto mt-2 w-48 bg-dark-card rounded-xl shadow-xl border border-gray-700 py-1 z-50 overflow-hidden ring-1 ring-black ring-opacity-5">
                     @if (authService.isAdmin()) {
-                      <a routerLink="/admin" class="block px-4 py-2.5 text-sm text-gray-200 hover:bg-gray-800">
+                      <a routerLink="/admin" (click)="showUserMenu.set(false)" class="block px-4 py-2.5 text-sm text-gray-200 hover:bg-gray-800">
                         {{ langService.translate('nav.admin_dashboard') }}
                       </a>
                     }
-                    <a routerLink="/profile/bookings" class="block px-4 py-2.5 text-sm text-gray-200 hover:bg-gray-800">
+                    <a routerLink="/profile/bookings" (click)="showUserMenu.set(false)" class="block px-4 py-2.5 text-sm text-gray-200 hover:bg-gray-800">
                       {{ langService.translate('nav.my_bookings') }}
                     </a>
-                    <a routerLink="/profile/settings" class="block px-4 py-2.5 text-sm text-gray-200 hover:bg-gray-800">
+                    <a routerLink="/profile/settings" (click)="showUserMenu.set(false)" class="block px-4 py-2.5 text-sm text-gray-200 hover:bg-gray-800">
                       {{ langService.translate('nav.settings') }}
                     </a>
                     <div class="h-px bg-gray-700 my-1"></div>
@@ -137,6 +145,64 @@ import { LanguageService } from '../../../core/services/language.service';
           </div>
         </div>
       </div>
+
+      <!-- Mobile Menu -->
+      @if (showMobileMenu()) {
+        <div class="md:hidden bg-dark-card border-t border-gray-800 animate-slide-down overflow-hidden">
+          <div class="px-4 pt-2 pb-6 space-y-1">
+            <a routerLink="/" routerLinkActive="bg-primary-600/10 text-primary-500" [routerLinkActiveOptions]="{exact: true}"
+               (click)="showMobileMenu.set(false)" class="block px-4 py-3 rounded-xl text-base font-bold text-gray-300">
+              {{ langService.translate('nav.home') }}
+            </a>
+            <a routerLink="/events" [queryParams]="{category: 'sports'}" routerLinkActive="bg-primary-600/10 text-primary-500"
+               (click)="showMobileMenu.set(false)" class="block px-4 py-3 rounded-xl text-base font-bold text-gray-300">
+              {{ langService.translate('nav.sports') }}
+            </a>
+            <a routerLink="/events" [queryParams]="{category: 'entertainment'}" routerLinkActive="bg-primary-600/10 text-primary-500"
+               (click)="showMobileMenu.set(false)" class="block px-4 py-3 rounded-xl text-base font-bold text-gray-300">
+              {{ langService.translate('nav.entertainment') }}
+            </a>
+            <a routerLink="/trains" routerLinkActive="bg-primary-600/10 text-primary-500"
+               (click)="showMobileMenu.set(false)" class="block px-4 py-3 rounded-xl text-base font-bold text-gray-300">
+              {{ langService.translate('nav.trains') }}
+            </a>
+            <a routerLink="/stores" routerLinkActive="bg-primary-600/10 text-primary-500"
+               (click)="showMobileMenu.set(false)" class="block px-4 py-3 rounded-xl text-base font-bold text-gray-300">
+              {{ langService.translate('nav.stores') }}
+            </a>
+            <a routerLink="/faq" routerLinkActive="bg-primary-600/10 text-primary-500"
+               (click)="showMobileMenu.set(false)" class="block px-4 py-3 rounded-xl text-base font-bold text-gray-300">
+              {{ langService.translate('nav.faq') }}
+            </a>
+            <a routerLink="/contact" routerLinkActive="bg-primary-600/10 text-primary-500"
+               (click)="showMobileMenu.set(false)" class="block px-4 py-3 rounded-xl text-base font-bold text-gray-300">
+              {{ langService.translate('nav.contact') }}
+            </a>
+            @if (authService.isAuthenticated()) {
+              <a routerLink="/ai-assistant" routerLinkActive="bg-primary-600/10 text-primary-500"
+                 (click)="showMobileMenu.set(false)" class="block px-4 py-3 rounded-xl text-base font-bold text-gray-300">
+                {{ langService.translate('nav.ai_assistant') }}
+              </a>
+              <div class="h-px bg-gray-800 my-4"></div>
+              <div class="flex items-center px-4 py-2">
+                <div class="w-10 h-10 bg-primary-600 rounded-full flex items-center justify-center text-white font-bold mr-3 rtl:mr-0 rtl:ml-3">
+                  {{ userInitial() }}
+                </div>
+                <div>
+                  <p class="text-sm font-bold text-white">{{ userName() }}</p>
+                  <p class="text-xs text-gray-500">{{ authService.currentUser()?.email }}</p>
+                </div>
+              </div>
+              <a routerLink="/profile/bookings" (click)="showMobileMenu.set(false)" class="block px-4 py-3 text-sm font-bold text-gray-300">
+                {{ langService.translate('nav.my_bookings') }}
+              </a>
+              <button (click)="logout(); showMobileMenu.set(false)" class="w-full text-left rtl:text-right px-4 py-3 text-sm font-bold text-red-500">
+                {{ langService.translate('nav.logout') }}
+              </button>
+            }
+          </div>
+        </div>
+      }
 
       <!-- Notification Panel -->
       @if (showNotifications()) {
@@ -172,6 +238,7 @@ import { LanguageService } from '../../../core/services/language.service';
 export class Navbar {
   showUserMenu = signal(false);
   showNotifications = signal(false);
+  showMobileMenu = signal(false);
 
   constructor(
     public authService: AuthService,
@@ -192,11 +259,19 @@ export class Navbar {
   toggleUserMenu(): void {
     this.showUserMenu.update(v => !v);
     this.showNotifications.set(false);
+    this.showMobileMenu.set(false);
   }
 
   toggleNotifications(): void {
     this.showNotifications.update(v => !v);
     this.showUserMenu.set(false);
+    this.showMobileMenu.set(false);
+  }
+
+  toggleMobileMenu(): void {
+    this.showMobileMenu.update(v => !v);
+    this.showUserMenu.set(false);
+    this.showNotifications.set(false);
   }
 
   markAsRead(notificationId: string): void {

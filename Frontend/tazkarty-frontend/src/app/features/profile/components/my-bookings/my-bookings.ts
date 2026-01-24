@@ -142,7 +142,7 @@ export class MyBookings implements OnInit {
 
   getEventPoster(booking: Booking): string {
     if ((booking as any).isTrain) {
-      return `${environment.socketUrl}/uploads/R.png`; // Using R.png from uploads
+      return `${environment.uploadsUrl}/R.png`; // Using R.png from uploads
     }
 
     let url = '';
@@ -158,7 +158,9 @@ export class MyBookings implements OnInit {
 
     // Fix for relative paths (local uploads)
     if (url && !url.startsWith('http')) {
-      return `${environment.socketUrl}/${url.replace(/\\/g, '/')}`;
+      // If it starts with 'uploads/', it already has the folder
+      const path = url.startsWith('uploads/') ? url.replace('uploads/', '') : url;
+      return `${environment.uploadsUrl}/${path.replace(/\\/g, '/')}`;
     }
 
     return url;

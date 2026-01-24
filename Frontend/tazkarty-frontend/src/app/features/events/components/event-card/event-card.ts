@@ -1,9 +1,9 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Event } from '../../../../models/event.model';
-
 import { LanguageService } from '../../../../core/services/language.service';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-event-card',
@@ -53,5 +53,15 @@ export class EventCard {
   get isSportsEvent(): boolean {
     const rawCategory = this.event.category_id && typeof this.event.category_id === 'object' && 'name' in this.event.category_id ? (this.event.category_id as any).name : '';
     return rawCategory.toLowerCase().includes('sports') || !!this.event.home_team;
+  }
+
+  getPosterUrl(): string {
+    const url = this.event.poster_url;
+    if (!url) return 'assets/placeholder-event.svg';
+    if (url.startsWith('http')) return url;
+
+    // Fix paths like uploads/image.png
+    const cleanPath = url.startsWith('uploads/') ? url.replace('uploads/', '') : url;
+    return `${environment.uploadsUrl}/${cleanPath.replace(/\\/g, '/')}`;
   }
 }

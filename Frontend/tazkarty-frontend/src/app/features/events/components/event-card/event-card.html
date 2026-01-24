@@ -3,9 +3,9 @@
 
     <!-- Image & Badges -->
     <div class="relative h-48 overflow-hidden bg-gray-100 dark:bg-gray-800">
-        <img [src]="event.poster_url || 'assets/placeholder-event.svg'" [alt]="event.title"
+        <img [src]="getPosterUrl()" [alt]="event.title"
             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+            onerror="this.src='assets/placeholder-event.svg'" />
 
         <!-- Fallback SVG if image fails -->
         <div class="absolute inset-0 flex items-center justify-center bg-gray-200 dark:bg-gray-800 hidden">

@@ -264,20 +264,28 @@ export class EventDetail implements OnInit {
 
   getStadiumLayoutImage(): string | null {
     const event = this.event();
+    let url = null;
+
     // 1. Check if event has specific layout override
     if (event && event.layout_image) {
-      return event.layout_image;
+      url = event.layout_image;
     }
     // 2. Fallback to stadium's default layout
-    if (event && event.stadium_id && typeof event.stadium_id === 'object') {
-      return (event.stadium_id as any).layout_image || null;
+    else if (event && event.stadium_id && typeof event.stadium_id === 'object') {
+      url = (event.stadium_id as any).layout_image || null;
     }
-    return null;
+
+    if (url && !url.startsWith('http')) {
+      const cleanPath = url.startsWith('uploads/') ? url.replace('uploads/', '') : url;
+      return `${environment.uploadsUrl}/${cleanPath.replace(/\\/g, '/')}`;
+    }
+    return url;
   }
 
   private formatPosterUrl(url: string): string {
     if (!url) return 'assets/placeholder-event.svg';
     if (url.startsWith('http')) return url;
-    return `${environment.socketUrl}/${url.startsWith('/') ? url.slice(1) : url}`; // Normalize path
+    const cleanPath = url.startsWith('uploads/') ? url.replace('uploads/', '') : url;
+    return `${environment.uploadsUrl}/${cleanPath.replace(/\\/g, '/')}`;
   }
 }
