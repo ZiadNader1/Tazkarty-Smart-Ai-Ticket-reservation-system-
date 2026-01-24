@@ -103,9 +103,9 @@ tazkarty/
 
 ## 📸 Screenshots
 
-| Home Page | AI Assistant | Seat Selection |
+| Home Page | AI Assistant (Nada) | Seat Selection |
 | :---: | :---: | :---: |
-| ![Home](https://raw.githubusercontent.com/ZiadNader1/Tazkarty-Smart-Ai-Ticket-reservation-system-/main/Frontend/tazkarty-frontend/public/uploads/image-1766245354744.png) | ![AI](https://raw.githubusercontent.com/ZiadNader1/Tazkarty-Smart-Ai-Ticket-reservation-system-/main/Frontend/tazkarty-frontend/public/uploads/poster-1766850209731.png) | ![Seats](https://raw.githubusercontent.com/ZiadNader1/Tazkarty-Smart-Ai-Ticket-reservation-system-/main/Frontend/tazkarty-frontend/public/uploads/layout_image-1766850209732.png) |
+| ![Home](screenshots/home.png) | ![AI Assistant](screenshots/ai_assistant.png) | ![Seat Selection](screenshots/seat_selection.png) |
 
 ---
 
