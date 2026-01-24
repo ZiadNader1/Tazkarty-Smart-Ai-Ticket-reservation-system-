@@ -138,18 +138,39 @@ Tazkarty is built using a layered **Micro-services inspired Architecture** that 
 
 ## 🔄 Core System Flow
 
+To ensure a seamless user experience, Tazkarty implements a highly structured **Activity Flow**. This diagram illustrates the comprehensive user journey, including event booking, train reservations, and intelligent AI assistance:
+
+![Activity Diagram](screenshots/activity_diagram_comprehensive.png)
+
+### 🚀 Key Technical Logic:
+*   **Multi-Path Discovery:** Users can find events through traditional browsing or conversational AI suggestion.
+*   **Real-time Locking:** Integrated database lock mechanism for seats during the checkout phase.
+*   **Adaptive Billing:** Real-time promo code validation and dynamic price adjustment before gateway submission.
+
+---
+
+## 📊 Database Design (ERD - Chen's Notation)
+
+Tazkarty's data model is documented below. This Diagram illustrates the Entities (Rectangles), their Attributes (Ovals), and the logical Relationships (Diamonds) between them:
+
+![ERD Diagram](screenshots/erd_diagram_classic.png)
+
+### 🔑 Logical Schema Breakdown:
+- **Entities & Attributes:** Every core component (User, Event, Ticket, Seat) is defined with its essential properties for high data integrity.
+- **Relationships (The Diamonds):** 
+    - **User <Owns> Ticket:** A 1:N relationship tracking booking ownership.
+    - **Event <Has> Show:** 1:N mapping of specific timings to an event category.
+    - **Ticket <Reserved> Seat:** Managing the link between a successful payment and physical inventory.
+- **Data Integrity:** The schema ensures that seats cannot be booked without a valid ticket and a linked user account.
+
+---
+
+## 🛡️ End-to-End Sequence
+
 The following **Sequence Diagram** represents the end-to-end journey from user discovery to ticket generation:
 
 ![Full Sequence Diagram](screenshots/full_sequence_diagram.png)
 
-### 🚀 Key Technical Flows:
-- **Authentication:** Secure JWT-based entry for Users and Admins.
-- **AI Chatbot (Nada):** Integrating Google Gemini API for intelligent event discovery and support.
-- **Real-time Engine:** Utilizing WebSockets (Socket.IO) for instant seat-locking globally.
-- **Financial Gateway:** Full Stripe API lifecycle management with secure webhook verification.
-- **Admin Management:** Comprehensive dashboard for stadium and event orchestration.
-
----
 
 ## 👤 Developer
 
