@@ -326,6 +326,7 @@ export class EventList implements OnInit {
   private formatPosterUrl(url: string | undefined): string | null {
     if (!url) return null;
     if (url.startsWith('http')) return url;
-    return `${environment.socketUrl}/${url}`;
+    const cleanPath = url.startsWith('uploads/') ? url.replace('uploads/', '') : url;
+    return `${environment.uploadsUrl}/${cleanPath.replace(/\\/g, '/')}`;
   }
 }

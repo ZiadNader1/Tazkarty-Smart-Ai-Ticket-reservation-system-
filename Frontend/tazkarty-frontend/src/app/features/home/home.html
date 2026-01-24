@@ -1,8 +1,8 @@
 <!-- Hero Section with Video Background -->
 <section class="relative h-screen overflow-hidden">
-    <!-- Video Background -->
-    <video #heroVideo autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover"
-        (loadeddata)="heroVideo.play()">
+    <!-- Video Background Optimized -->
+    <video #heroVideo autoplay muted loop playsinline preload="auto"
+        class="absolute inset-0 w-full h-full object-cover z-0 bg-black">
         <source src="/home-page.mp4" type="video/mp4">
     </video>
 
@@ -102,15 +102,9 @@
 
                 <!-- Background Image -->
                 <div class="absolute inset-0">
-                    @if (event.poster_url) {
-                    <img [src]="event.poster_url" [alt]="event.title"
+                    <img [src]="formatPosterUrl(event.poster_url)" [alt]="event.title"
                         class="w-full h-full object-cover transform transition-transform duration-[10s] ease-linear"
-                        [class.scale-110]="activeSlideIndex() === i">
-                    } @else {
-                    <div class="w-full h-full bg-gray-800 flex items-center justify-center">
-                        <span class="text-5xl opacity-20">🎟️</span>
-                    </div>
-                    }
+                        [class.scale-110]="activeSlideIndex() === i" onerror="this.src='assets/placeholder-event.svg'">
                     <div class="absolute inset-0 bg-gradient-to-t from-dark-bg via-dark-bg/60 to-transparent"></div>
                 </div>
 

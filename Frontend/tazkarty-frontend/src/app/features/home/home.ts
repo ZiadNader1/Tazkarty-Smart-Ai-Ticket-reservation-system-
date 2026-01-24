@@ -9,7 +9,7 @@ import { Router, RouterModule } from '@angular/router';
 import { EventsService } from '../../core/services/events.service';
 import { Event } from '../../models/event.model';
 import { LanguageService } from '../../core/services/language.service';
-
+import { environment } from '../../../environments/environment';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -152,5 +152,12 @@ export class Home implements OnInit, OnDestroy {
 
   getVenueLabel(event: Event): string {
     return event.type === 'sports' ? 'common.stadium' : 'common.venue';
+  }
+
+  formatPosterUrl(url: string | undefined): string {
+    if (!url) return 'assets/placeholder-event.svg';
+    if (url.startsWith('http')) return url;
+    const cleanPath = url.startsWith('uploads/') ? url.replace('uploads/', '') : url;
+    return `${environment.uploadsUrl}/${cleanPath.replace(/\\/g, '/')}`;
   }
 }
