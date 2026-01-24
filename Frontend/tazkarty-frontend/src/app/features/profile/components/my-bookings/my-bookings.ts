@@ -157,10 +157,12 @@ export class MyBookings implements OnInit {
     }
 
     // Fix for relative paths (local uploads)
-    if (url && !url.startsWith('http')) {
-      // If it starts with 'uploads/', it already has the folder
-      const path = url.startsWith('uploads/') ? url.replace('uploads/', '') : url;
-      return `${environment.uploadsUrl}/${path.replace(/\\/g, '/')}`;
+    if (url) {
+      if (url.startsWith('http') && !url.includes('localhost:5000') && !url.includes('onrender.com')) {
+        return url;
+      }
+      const filename = url.split('/').pop()?.split('\\').pop();
+      return `${environment.uploadsUrl}/${filename}`;
     }
 
     return url;

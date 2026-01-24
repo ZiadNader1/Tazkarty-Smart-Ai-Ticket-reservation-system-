@@ -325,8 +325,10 @@ export class EventList implements OnInit {
 
   private formatPosterUrl(url: string | undefined): string | null {
     if (!url) return null;
-    if (url.startsWith('http')) return url;
-    const cleanPath = url.startsWith('uploads/') ? url.replace('uploads/', '') : url;
-    return `${environment.uploadsUrl}/${cleanPath.replace(/\\/g, '/')}`;
+    if (url.startsWith('http') && !url.includes('localhost:5000') && !url.includes('onrender.com')) {
+      return url;
+    }
+    const filename = url.split('/').pop()?.split('\\').pop();
+    return `${environment.uploadsUrl}/${filename}`;
   }
 }

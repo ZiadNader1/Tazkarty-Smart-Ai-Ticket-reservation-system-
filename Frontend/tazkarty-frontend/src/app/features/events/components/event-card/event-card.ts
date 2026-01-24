@@ -58,10 +58,14 @@ export class EventCard {
   getPosterUrl(): string {
     const url = this.event.poster_url;
     if (!url) return 'assets/placeholder-event.svg';
-    if (url.startsWith('http')) return url;
 
-    // Fix paths like uploads/image.png
-    const cleanPath = url.startsWith('uploads/') ? url.replace('uploads/', '') : url;
-    return `${environment.uploadsUrl}/${cleanPath.replace(/\\/g, '/')}`;
+    // If it's a third-party URL (not our local or render backend), keep it
+    if (url.startsWith('http') && !url.includes('localhost:5000') && !url.includes('onrender.com')) {
+      return url;
+    }
+
+    // Otherwise, extract filename and serve from our public/uploads
+    const filename = url.split('/').pop()?.split('\\').pop();
+    return `${environment.uploadsUrl}/${filename}`;
   }
 }

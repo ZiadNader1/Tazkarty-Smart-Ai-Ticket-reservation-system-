@@ -275,17 +275,22 @@ export class EventDetail implements OnInit {
       url = (event.stadium_id as any).layout_image || null;
     }
 
-    if (url && !url.startsWith('http')) {
-      const cleanPath = url.startsWith('uploads/') ? url.replace('uploads/', '') : url;
-      return `${environment.uploadsUrl}/${cleanPath.replace(/\\/g, '/')}`;
+    if (url) {
+      if (url.startsWith('http') && !url.includes('localhost:5000') && !url.includes('onrender.com')) {
+        return url;
+      }
+      const filename = url.split('/').pop()?.split('\\').pop();
+      return `${environment.uploadsUrl}/${filename}`;
     }
     return url;
   }
 
-  private formatPosterUrl(url: string): string {
+  private formatPosterUrl(url: string | undefined): string {
     if (!url) return 'assets/placeholder-event.svg';
-    if (url.startsWith('http')) return url;
-    const cleanPath = url.startsWith('uploads/') ? url.replace('uploads/', '') : url;
-    return `${environment.uploadsUrl}/${cleanPath.replace(/\\/g, '/')}`;
+    if (url.startsWith('http') && !url.includes('localhost:5000') && !url.includes('onrender.com')) {
+      return url;
+    }
+    const filename = url.split('/').pop()?.split('\\').pop();
+    return `${environment.uploadsUrl}/${filename}`;
   }
 }
