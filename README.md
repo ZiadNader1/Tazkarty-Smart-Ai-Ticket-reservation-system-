@@ -1,4 +1,4 @@
-# 🎟️ Tazkarty - Smart AI Ticket Reservation System
+# Tazkarty - Smart AI Ticket Reservation System
 
 [![Live Demo](https://img.shields.io/badge/demo-live-green.svg)](https://tazkartyapp.netlify.app/)
 [![Angular](https://img.shields.io/badge/Angular-19.0-DD0031.svg?logo=angular)](https://angular.io/)
@@ -9,31 +9,31 @@
 
 ---
 
-## ✨ Key Features
+## Key Features
 
-### 🤖 Smart AI Assistant (Nada)
+### Smart AI Assistant (Nada)
 *   **Conversational Booking:** Discover events and check availability through natural language.
 *   **Intelligent Recommendations:** Get personalized match and show suggestions.
 *   **24/7 Support:** Automated help for FAQs and booking guidance.
 
-### 🏟️ Advanced Event Management
+### Advanced Event Management
 *   **Dynamic Seat Mapping:** interactive SVG-based seat selection for stadiums and theaters.
 *   **Sports Focus:** Specialized flow for football matches, including team filters and stadium layouts.
 *   **Real-time Availability:** Instant seat locking and status updates via Socket.IO.
 
-### 🚆 Premium Train Reservations
+### Premium Train Reservations
 *   **Journey Planning:** Easy search for Cairo-based rail expeditions.
 *   **Carriage Selection:** Visual maps for first-class, VIP, and standard carriages.
 *   **National ID Integration:** Simplified verification for secure travel.
 
-### 💳 Secure & Global
+### Secure & Global
 *   **Stripe Integration:** Fully secure payment processing.
 *   **Bilingual (AR/EN):** Full RTL support for a native Arabic experience.
 *   **Dark Mode Aesthetics:** Premium glassmorphism design optimized for all devices.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Frontend
 - **Framework:** Angular 19 (Standalone Components, Signals API)
@@ -49,7 +49,7 @@
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Node.js (v20+)
@@ -82,7 +82,7 @@
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```text
 tazkarty/
@@ -101,7 +101,7 @@ tazkarty/
 
 ---
 
-## 📸 Screenshots
+## Screenshots
 
 | Home Page | AI Assistant (Nada) | Seat Selection |
 | :---: | :---: | :---: |
@@ -109,13 +109,13 @@ tazkarty/
 
 ---
 
-## 🏗️ System Architecture & Engineering Design
+## System Architecture & Engineering Design
 
 Tazkarty is built using a layered **Micro-services inspired Architecture** that ensures separation of concerns, scalability, and real-time performance. Below is the **System Component Diagram** illustrating the interaction between various layers:
 
 ![System Architecture Diagram](screenshots/system_architecture_diagram.png)
 
-### 🧱 Architectural Layers:
+### Architectural Layers:
 
 1.  **Client Layer (Angular 19):**
     *   **Auth Module:** Manages secure JWT-based sessions.
@@ -136,29 +136,29 @@ Tazkarty is built using a layered **Micro-services inspired Architecture** that 
 
 ---
 
-## 🔄 Core System Flow
+## Core System Flow
 
 To ensure a seamless user experience, Tazkarty implements a highly structured **Activity Flow**. This diagram illustrates the comprehensive user journey, including event booking, train reservations, and intelligent AI assistance:
 
 ![Activity Diagram](screenshots/activity_diagram_comprehensive.png)
 
-### 🚀 Key Technical Logic:
+### Key Technical Logic:
 *   **Multi-Path Discovery:** Users can find events through traditional browsing or conversational AI suggestion.
 *   **Real-time Locking:** Integrated database lock mechanism for seats during the checkout phase.
 *   **Adaptive Billing:** Real-time promo code validation and dynamic price adjustment before gateway submission.
 
 ---
 
-## 🛡️ End-to-End Sequence
+## End-to-End Sequence
 
 The following **Sequence Diagram** represents the end-to-end journey from user discovery to ticket generation:
 
 ![Full Sequence Diagram](screenshots/full_sequence_diagram.png)
 
 
-## 👤 Developer
+## Developer
 
-Developed with ❤️ by **Ziad Nader**.
+Developed by **Ziad Nader**.
 
 - **LinkedIn:** [Ziad Nader](https://www.linkedin.com/in/ziad-nader-5b86a2303/)
 - **GitHub:** [@ZiadNader1](https://github.com/ZiadNader1)
@@ -168,5 +168,5 @@ Developed with ❤️ by **Ziad Nader**.
 
 ---
 
-## 📄 License
+## License
 This project is for educational and portfolio purposes. All rights reserved.
