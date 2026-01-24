@@ -51,23 +51,20 @@ app.use(cors({
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
 
-    const allowedOrigins = ["http://localhost:3000", "http://localhost:4200", "http://localhost:52106", "http://localhost:62787", process.env.FRONTEND_URL].filter(Boolean);
+    const allowedOrigins = [
+      "http://localhost:3000",
+      "http://localhost:4200",
+      "https://tazkartyapp.netlify.app",
+      process.env.FRONTEND_URL
+    ].filter(Boolean).map(url => url.replace(/\/$/, "")); // Remove trailing slashes
 
-    // Also allow any localhost in development
-    if (process.env.NODE_ENV === 'development' && origin.startsWith('http://localhost:')) {
-      return callback(null, true);
-    }
+    // Allow Netlify subdomains and the explicit origins
+    const isAllowed = allowedOrigins.includes(origin) ||
+      (origin && origin.endsWith('.netlify.app')) ||
+      (origin && origin.endsWith('.vercel.app'));
 
-    // Allow any Vercel deployment
-    if (origin.endsWith('.vercel.app')) {
-      return callback(null, true);
-    }
-
-    if (allowedOrigins.indexOf(origin) === -1) {
-      // For debugging, you might want to log the blocked origin
+    if (!isAllowed) {
       console.log('Blocked by CORS:', origin);
-      // Fail safely for unknown origins to avoid crashing
-      // return callback(new Error('The CORS policy for this site does not allow access from the specified Origin.'), false); 
       return callback(null, false);
     }
     return callback(null, true);
