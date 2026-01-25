@@ -149,12 +149,29 @@ To ensure a seamless user experience, Tazkarty implements a highly structured **
 
 ---
 
+---
+
+## Database Design (ERD)
+
+Tazkarty uses a robust relational data model (documented here in Chen's Notation) designed for high data integrity and flexibility. The system distinguishes between general events and specific shows, allowing for complex scheduling and real-time seat management.
+
+![Comprehensive ERD Diagram](screenshots/comprehensive_erd_diagram.png)
+
+### Logical Schema Architecture:
+- **Event-Show Separation:** Events act as templates, while Shows handle specific timing, pricing, and dynamic inventory.
+- **Unified Inventory:** A flexible mapping system that supports both traditional Venues (Theaters/Cinemas) and large-scale Stadiums.
+- **Transactional Integrity:** Integrated tracking for Bookings, Payments, and Promo Code utilization.
+- **AI Context Support:** Dedicated entities for storing AI conversation history to provide personalized user assistance.
+
+---
+
 ## End-to-End Sequence
 
 The following **Sequence Diagram** represents the end-to-end journey from user discovery to ticket generation:
 
 ![Full Sequence Diagram](screenshots/full_sequence_diagram.png)
 
+---
 
 ## Developer
 
