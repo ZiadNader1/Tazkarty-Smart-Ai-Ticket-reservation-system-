@@ -178,6 +178,19 @@ The following **Sequence Diagram** represents the end-to-end journey from user d
 
 ---
 
+## System State Management
+
+To maintain consistency across the reservation lifecycle, Tazkarty utilizes a formal **State Machine** logic. This ensures that every booking, seat, and payment follows a strict, non-conflicting path from initialization to completion or cancellation.
+
+![State Machine Diagram](screenshots/state_machine_diagram.png)
+
+### Operational States:
+- **Booking Control:** Orchestrates the flow from 'Browsing' through 'Seat Selection' to final 'Ticket Issuance'.
+- **Atomic Seat Locking:** Prevents double-booking by implementing a time-limited 'Locked' state before permanent commitment.
+- **Financial Reconciliation:** Tracks transaction states with full support for gateway-driven callbacks and refund processing.
+
+---
+
 ## Developer
 
 Developed by **Ziad Nader**.
