@@ -155,7 +155,12 @@ To ensure a seamless user experience, Tazkarty implements a highly structured **
 
 Tazkarty uses a robust relational data model (documented here in Chen's Notation) designed for high data integrity and flexibility. The system distinguishes between general events and specific shows, allowing for complex scheduling and real-time seat management.
 
-![Comprehensive ERD Diagram](screenshots/comprehensive_erd_diagram.png)
+> [!TIP]
+> **[Click here to view the Full High-Resolution ERD Diagram](screenshots/comprehensive_erd_diagram.png)**
+
+<a href="screenshots/comprehensive_erd_diagram.png" target="_blank">
+  <img src="screenshots/comprehensive_erd_diagram.png" alt="Comprehensive ERD Diagram" width="100%">
+</a>
 
 ### Logical Schema Architecture:
 - **Event-Show Separation:** Events act as templates, while Shows handle specific timing, pricing, and dynamic inventory.
