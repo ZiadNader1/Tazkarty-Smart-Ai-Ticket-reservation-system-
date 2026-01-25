@@ -45,7 +45,7 @@
 - **Runtime:** Node.js (Express.js)
 - **Database:** MongoDB with Mongoose ODM
 - **Authenticaton:** JWT (JSON Web Tokens)
-- **AI Integration:** Google Gemini API (Generative AI)
+- **AI Integration:** Hugging Face API (Meta-Llama-3-8B)
 
 ---
 
@@ -55,7 +55,7 @@
 - Node.js (v20+)
 - MongoDB Atlas account or local installation
 - Stripe Account (for payments)
-- Google AI Studio API Key (for the AI Assistant)
+- Hugging Face API Key (for the AI Assistant)
 
 ### Installation
 
@@ -126,11 +126,11 @@ Tazkarty is built using a layered **Micro-services inspired Architecture** that 
 2.  **Logic Layer (Node.js & Express):**
     *   **RESTful Controllers:** Secure API endpoints for all CRUD operations.
     *   **Socket.IO Manager:** Real-time event emitter for instant seat synchronization.
-    *   **Service Layer:** Dedicated services for Gemini AI integration and Stripe payment lifecycle.
+    *   **Service Layer:** Dedicated services for Hugging Face AI integration and Stripe payment lifecycle.
 
 3.  **Infrastructure & External Services:**
     *   **Database:** MongoDB Atlas for high-availability data storage.
-    *   **AI:** Google Gemini API for Natural Language Processing.
+    *   **AI:** Hugging Face API (Meta-Llama-3-8B) for Natural Language Processing.
     *   **Payments:** Stripe API for secure financial transactions.
     *   **Hosting:** Netlify (Frontend) & Render (Backend) with CI/CD integration.
 
