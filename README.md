@@ -149,6 +149,14 @@ To ensure a seamless user experience, Tazkarty implements a highly structured **
 
 ---
 
+## User Interaction Model (Use Case)
+
+The following **Use Case Diagram** outlines the functional requirements and the boundaries between the User, Admin, and integrated external systems (AI & Payments).
+
+![Use Case Diagram](screenshots/use_case_diagram.png)
+
+---
+
 ---
 
 ## Database Design (ERD)
