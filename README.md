@@ -178,6 +178,14 @@ Tazkarty uses a robust relational data model (documented here in Chen's Notation
 
 ---
 
+## Domain Model (Class Diagram)
+
+To ensure a robust object-oriented design, Tazkarty follows a standardized **Class Schema**. This diagram illustrates the attributes, methods, and relationships (Associations, Compositions, and Dependencies) between the core entities.
+
+![Class Diagram](screenshots/class_diagram.png)
+
+---
+
 ## End-to-End Sequence
 
 The following **Sequence Diagram** represents the end-to-end journey from user discovery to ticket generation:
