@@ -1,8 +1,8 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://tazkarty-backend.onrender.com/api',
-  socketUrl: 'https://tazkarty-backend.onrender.com',
-  uploadsUrl: '/uploads',
+  apiUrl: 'https://tazkarty-smart-ai-ticket-reservation.onrender.com/api',
+  socketUrl: 'https://tazkarty-smart-ai-ticket-reservation.onrender.com',
+  uploadsUrl: 'https://tazkarty-smart-ai-ticket-reservation.onrender.com/uploads',
   stripePublishableKey: 'pk_test_TYooMQauvdEDq54NiTphI7jx',
 
   features: {
